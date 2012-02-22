@@ -9,8 +9,13 @@ void func(int numero)
 
 int main() {
   ucontext_t uc, previous;
-
+  
+  //int i = 1;
   getcontext(&uc);
+  //  printf("i = %d\n",i++);
+  // setcontext(&uc);
+ 
+
   uc.uc_stack.ss_size = 64*1024;
   uc.uc_stack.ss_sp = malloc(uc.uc_stack.ss_size);
   uc.uc_link = &previous;
