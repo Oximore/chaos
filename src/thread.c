@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ucontext.h>
+#include "thread.h"
+#include "list.h"
 
-//#include "list.h"
 
 // Variables Globales
 struct list thread_list;
@@ -16,8 +17,21 @@ struct thread{
   int priority;
 };
 
+void thread_delete(thread_t t)
+{
+  struct thread * t2 = (struct thread *) t;
+  free(t2->context->uc_stack.ss_sp);
+  free(t2->context);
+  free(t2);
+}
+
+int main()
+{
+  
+  return EXIT_SUCCESS;
+}
 // Fonctions
-extern thread_t thread_self(void){
+/*extern thread_t thread_self(void){
   return thread_current;
 }
 
@@ -67,3 +81,4 @@ extern int thread_yield(void){
 
 extern int thread_join(thread_t thread, void **retval);
 extern void thread_exit(void *retval) __attribute__ ((__noreturn__));
+*/

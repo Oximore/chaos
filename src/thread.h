@@ -8,7 +8,7 @@
  */
 typedef void* thread_t;
 // typedef struct thread* thread_t;
-
+void thread_delete(thread_t);
 
 /* recuperer l'identifiant du thread courant.
  */
