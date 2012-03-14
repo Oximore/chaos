@@ -40,40 +40,7 @@ void list_add(struct list * l, thread_t t)
   l->first = e;
   l->size++;
 }
-/*
-void list_element_delete(struct list * l, thread_t t)
-{
-  if(l->first == NULL)
-    return;
-  if(l->first->next ==NULL)
-    {
-      if(l->first->thread == t)
-	{
-	  element_delete(l->first);
-	  l->size =0;
-	  return;
-	}
-      return;
-    }
-  if(l->first->thread == t)
-    {
-      element_delete(l->first);
-      l->size--;
-      return;
-    }
-  struct element * tmp = l->first;
-  while(tmp->next != NULL)
-    {
-      if(tmp->next->thread == t)
-	{
-	  struct element * e = element_delete(tmp->next);
-	  tmp->next = e;
-	  l->size--;
-	  return;
-	}
-      tmp = tmp->next;
-    }
-    }*/
+
 
 struct element * element_init(thread_t t)
 {
@@ -122,5 +89,15 @@ void list_element_delete(struct list * l, struct element * e, int(*fct)(struct e
 	  return;
 	}
       tmp = tmp->next;
+    }
+}
+
+void print_list(struct list * l)
+{
+  struct element * e = l->first;
+  while(e!=NULL)
+    {
+      printf("%d\n",e->thread->priority);
+      e=e->next;
     }
 }

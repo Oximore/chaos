@@ -7,15 +7,11 @@
 
 
 // Variables Globales
-struct list thread_list;
+struct list *thread_list;
 struct thread *thread_current;
 
 
-// Structures
-struct thread{
-  ucontext_t* context;
-  int priority;
-};
+
 
 void thread_delete(thread_t t)
 {
@@ -24,10 +20,22 @@ void thread_delete(thread_t t)
   free(t2->context);
   free(t2);
 }
+void f(int a)
+{
+  printf("%d\n",a);
+  return ;
+}
 
 int main()
 {
-  
+  thread_list = list_init();
+  thread_t t;
+  t = malloc(sizeof(struct thread));
+  thread_create(t,(void *(*)(void*))&f,(void *)14);
+  list_add(thread_list,t);
+  list_add(thread_list,t);
+  print_list(thread_list);
+  list_delete(thread_list);
   return EXIT_SUCCESS;
 }
 // Fonctions
@@ -51,20 +59,14 @@ int f(int adresse1,int adresse2){
 
 
 */
-void f(int a)
-{
-  printf("%d\n",a);
-  return ;
-}
+
 
 extern int thread_create(thread_t new_thread, void *(*func)(void *), void *funcarg)
 {
-  new_thread = malloc(sizeof(struct thread));
   new_thread->priority = 0;
-
   new_thread->context = malloc(sizeof(ucontext_t));
-
   getcontext(new_thread->context);
+  
   new_thread->context->uc_stack.ss_size = 64*1024;
   new_thread->context->uc_stack.ss_sp    = malloc(new_thread->context->uc_stack.ss_size);
   new_thread->context->uc_link                =  NULL; 

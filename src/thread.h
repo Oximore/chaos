@@ -1,11 +1,18 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__
+#include <ucontext.h>
+
 
 /* identifiant de thread
  * NB: pourra être un entier au lieu d'un pointeur si ca vous arrange,
  *     mais attention aux inconvénient des tableaux de threads
  *     (consommation mémoire, cout d'allocation, ...).
  */
+// Structures
+struct thread{
+  ucontext_t* context;
+  int priority;
+};
 //typedef void* thread_t;
 typedef struct thread* thread_t;
 void thread_delete(thread_t);
