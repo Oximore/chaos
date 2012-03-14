@@ -50,24 +50,29 @@ int f(int adresse1,int adresse2){
 }
 
 
+*/
+void f(int a)
+{
+  printf("%d\n",a);
+  return ;
+}
 
-extern int thread_create(struct thread **newthread, void *(*func)(void *), void *funcarg){
-  struct thread* new_thread = malloc(sizeof(struct thread));
+extern int thread_create(thread_t new_thread, void *(*func)(void *), void *funcarg)
+{
+  new_thread = malloc(sizeof(struct thread));
   new_thread->priority = 0;
 
   new_thread->context = malloc(sizeof(ucontext_t));
 
   getcontext(new_thread->context);
-  thread_context.uc_stack.ss_size = 64*1024;
-  thread_context.uc_stack.ss_sp    = malloc(thread_context.uc_stack.ss_size);
-  thread_context.uc_link                =  NULL; 
-  
-  
-  func(funcarg);
-  
+  new_thread->context->uc_stack.ss_size = 64*1024;
+  new_thread->context->uc_stack.ss_sp    = malloc(new_thread->context->uc_stack.ss_size);
+  new_thread->context->uc_link                =  NULL; 
+  makecontext(new_thread->context,(void (*)(void)) func,(int)funcarg);
+  return 1;
 }
 
-
+/*
 
 
 

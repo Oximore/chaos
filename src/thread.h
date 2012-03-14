@@ -6,8 +6,8 @@
  *     mais attention aux inconvénient des tableaux de threads
  *     (consommation mémoire, cout d'allocation, ...).
  */
-typedef void* thread_t;
-// typedef struct thread* thread_t;
+//typedef void* thread_t;
+typedef struct thread* thread_t;
 void thread_delete(thread_t);
 
 /* recuperer l'identifiant du thread courant.
@@ -17,7 +17,7 @@ extern thread_t thread_self(void);
 /* creer un nouveau thread qui va exécuter la fonction func avec l'argument funcarg.
  * renvoie 0 en cas de succès, -1 en cas d'erreur.
  */
-extern int thread_create(thread_t *newthread, void *(*func)(void *), void *funcarg);
+extern int thread_create(thread_t newthread, void *(*func)(void *), void *funcarg);
 
 /* passer la main à un autre thread.
   */
