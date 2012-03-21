@@ -5,6 +5,7 @@ struct list * list_init()
 {
   struct list * l = malloc(sizeof(struct list));
   l->first = NULL;
+  l->last = NULL;
   l->size = 0;
   return l;
 }
@@ -42,6 +43,13 @@ void list_add(struct list * l, thread_t t)
   l->size++;
 }
 
+void list_add_last(struct list *, thread_t )
+{
+  struct element * e = element_init(t);
+  l->last->next = e;
+  l->last = e;
+  l->size++;
+}
 
 struct element * element_init(thread_t t)
 {
@@ -84,10 +92,21 @@ void list_element_delete(struct list * l, struct element * e, int(*fct)(struct e
     {
       if(fct(tmp->next,e))
 	{
-	  struct element * e = element_delete(tmp->next);
-	  tmp->next = e;
-	  l->size--;
-	  return;
+	  if(tmp->next == l->last)
+	    {
+	      struct element * e = element_delete(tmp->next);
+	      tmp->next = e;
+	      l->size--;
+	      l->last == tmp;
+	      return;
+	    }
+	  else
+	    {
+	      struct element * e = element_delete(tmp->next);
+	      tmp->next = e;
+	      l->size--;
+	      return;
+	    }
 	}
       tmp = tmp->next;
     }
@@ -104,21 +123,24 @@ void print_list(struct list * l)
     }
 }
 
-thread_t get_lower_priority_thread(struct list * li)
+thread_t get_lower_priority_thread(struct list * l)
 {
-  
-  struct element * l = li->first;
-  struct element * ret = li->first;
-  struct thread * caca = l->thread;
-  int prio = caca->priority;
-  while(l->next != NULL)
+  if(l == NULL)
+    return NULL;
+  if(l->first == NULL)
+    return NULL;
+  if(l->first->next == NULL)
     {
-      l=l->next;
-      if(l->thread->priority < prio)
-	{
-	  prio = l->thread->priority;
-	  ret = l;
-	}
+      struct element * e = l->first;
+      l->first = l->first->next;
+      size--;
+      l->last == NULL;
     }
-  return ret->thread;
+  else
+    {
+      struct element * e = l->first;
+      l->first = l->first->next;
+      size--;
+    }
+  return e->thread;
 }

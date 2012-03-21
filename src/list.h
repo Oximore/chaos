@@ -8,6 +8,7 @@
 struct list 
 {
   struct element * first;
+  struct element * last;
   int size;
 };
 
