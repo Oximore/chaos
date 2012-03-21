@@ -11,8 +11,6 @@ struct list *thread_list;
 struct thread *thread_current;
 
 
-
-
 void thread_delete(thread_t t)
 {
   struct thread * t2 = (struct thread *) t;
@@ -61,6 +59,7 @@ int f(int adresse1,int adresse2){
 */
 
 
+
 extern int thread_create(thread_t new_thread, void *(*func)(void *), void *funcarg)
 {
   new_thread->priority = 0;
@@ -74,18 +73,21 @@ extern int thread_create(thread_t new_thread, void *(*func)(void *), void *funca
   return 1;
 }
 
-/*
-
 
 
 // pour le moment sans priorité
-extern int thread_yield(void){
-  // Sauvegarder le contexte courant, charger le suivant et changer le current
-  
-  
-}
+
+  extern int thread_yield(void)
+  {
+    // Sauvegarder le contexte courant, charger le suivant et changer le current
+    
+    ucontext_t *ucp = malloc(sizeof(ucontext_t));
+    getcontext(ucp);
+    thread_t next = get_lower_priority_thread(thread_list);
+    return swapcontext(next->context, ucp);
+  }
 
 
 extern int thread_join(thread_t thread, void **retval);
 extern void thread_exit(void *retval) __attribute__ ((__noreturn__));
-*/
+

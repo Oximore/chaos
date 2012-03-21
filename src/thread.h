@@ -2,7 +2,6 @@
 #define __THREAD_H__
 #include <ucontext.h>
 
-
 /* identifiant de thread
  * NB: pourra être un entier au lieu d'un pointeur si ca vous arrange,
  *     mais attention aux inconvénient des tableaux de threads
@@ -15,6 +14,12 @@ struct thread{
 };
 //typedef void* thread_t;
 typedef struct thread* thread_t;
+
+
+
+
+
+
 void thread_delete(thread_t);
 
 /* recuperer l'identifiant du thread courant.

@@ -24,4 +24,6 @@ void list_element_delete(struct list *,struct element *, int(*fct)(struct elemen
 struct element * element_init(thread_t );
 struct element * element_delete(struct element * );
 void print_list(struct list * );
+thread_t get_lower_priority_thread(struct list *);
+
 #endif /* __LIST_H__ */

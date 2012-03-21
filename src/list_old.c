@@ -1,5 +1,4 @@
 #include "list.h"
-#include "thread.h"
 
 struct list * list_init()
 {
@@ -93,7 +92,6 @@ void list_element_delete(struct list * l, struct element * e, int(*fct)(struct e
     }
 }
 
-
 void print_list(struct list * l)
 {
   struct element * e = l->first;
@@ -102,23 +100,4 @@ void print_list(struct list * l)
       printf("%d\n",e->thread->priority);
       e=e->next;
     }
-}
-
-thread_t get_lower_priority_thread(struct list * li)
-{
-  
-  struct element * l = li->first;
-  struct element * ret = li->first;
-  struct thread * caca = l->thread;
-  int prio = caca->priority;
-  while(l->next != NULL)
-    {
-      l=l->next;
-      if(l->thread->priority < prio)
-	{
-	  prio = l->thread->priority;
-	  ret = l;
-	}
-    }
-  return ret->thread;
 }
