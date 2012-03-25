@@ -10,6 +10,7 @@
 // Structures
 struct thread{
   ucontext_t* context;
+  void ** retval;
   int priority;
 };
 
