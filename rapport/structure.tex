@@ -1,1 +1,15 @@
-\section{}
+\section{Structure}
+La liste des threads est implémentée de façon simple, il s'agit d'une liste d'élément chaînés. Nous avons choisi de mettre un pointeur sur le dernier élément de la liste pour des raisons pratiques. (cela sera expliqué plus loin).
+
+La liste contient des structures threads :
+\begin{verbatim}
+struct thread{
+  ucontext_t* context;
+  int priority;
+};
+\end{verbatim}
+
+Le champs priorité n'est pas utilisé pour l'instant, il est prévu (à la base) pour modifier la priorité d'exécution des différents threads.
+
+\section{Sélection et insertion de threads}
+Au lieu d'implémenter directement une gestion des priorités, les threads sont sélectionnés en tête (afin d'être exécutés), et ajoutés en queue. On utilise donc le procédé fifo.
