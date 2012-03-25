@@ -1,0 +1,22 @@
+\section{Avancement actuel}
+À l'heure actuelle nous avons implémenté la totalité des fonctions de l'interface \textit{thread.h} proposée. 
+
+\subsection{thread\_self}
+Cette fonction retourne juste le pointeur vers notre structure.
+L'adresse en mémoire de celle ci étant unique, celà fait un identifiant unique pour chaque thread (une fois casté en int).
+
+\subsection{thread\_create}
+Cette fonction créer un nouveau thread en allouant la place nécessaire à un \textit{struct thread} ainsi qu'à une pile de la même taille que le programme courant. On remplit le \textit{u\_context} avec le context courant puis on appelle \textit{makecontext()} avec une fonction qui se chargera d'apeller la fonction passé en paramètre puis stockera son résultat et enfin détruira le thread en désalouant la mémoire consomée par le \textit{u\_context}.
+
+\subsection{thread\_yield}
+Elle remplace le thread courrant avec celui qui est retirer de la pile avec \textit{get\_lower\_priority\_thread()}. Dans le cas ou la pile est vide, $i.e.$ il n'y a pas d'autre thread que le thread courant, cette fonction ne fait rien.
+
+\subsection{thread\_join}
+Cette fonction se contente de vérifier si le thread passé en argument est terminé, si c'est le cas on récupère la valeur de retour stocker avant la destruction du thread. 
+
+
+\subsection{thread\_exit}
+Cette fonction termine et désaloue le thread courant.
+
+\section{Travail à venir}
+
