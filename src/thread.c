@@ -21,10 +21,10 @@ void thread_delete(thread_t t)
 }
 
 // Fonctions
-/*extern thread_t thread_self(void){
+extern thread_t thread_self(void){
   return thread_current;
 }
-
+/*
 //       int getcontext(ucontext_t *ucp);
 //       int setcontext(const ucontext_t *ucp);
 //       void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
@@ -41,7 +41,12 @@ int f(int adresse1,int adresse2){
 void function(void *(func)(void *), void* funcarg){
   func(funcarg);
   
+
+
   thread_exit(NULL);// *TODO*
+
+
+
 }
 
 
@@ -85,8 +90,14 @@ extern int thread_create(thread_t* new_thread, void *(*func)(void *), void *func
 
 
 extern int thread_join(thread_t thread, void **retval){
-  
 
+  /*
+  while (exist(thread)){
+    thread_yield();
+  }
+
+  remplire(retval,thread)
+  */
   return 0;
 }
 
