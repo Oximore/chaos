@@ -10,7 +10,6 @@
 struct list *thread_list;
 struct thread *thread_current;
 
-void thread_delete(thread_t t);
 
 void thread_delete(thread_t t)
 {
@@ -60,8 +59,9 @@ extern int thread_create(thread_t* new_thread, void *(*func)(void *), void *func
   
   nw_thread->context->uc_stack.ss_size = 64*1024;
   nw_thread->context->uc_stack.ss_sp   = malloc(nw_thread->context->uc_stack.ss_size);
-  nw_thread->context->uc_link                =  NULL; 
-  
+  nw_thread->context->uc_link =  NULL; 
+  list_add_last(thread_list,thread_current);
+  thread_current = nw_thread;
   makecontext(nw_thread->context, (void (*)(void)) function, 2, (int)func, (int)funcarg);
   return 0;  // *TODO* valeur de retour
 }
@@ -90,14 +90,11 @@ extern int thread_create(thread_t* new_thread, void *(*func)(void *), void *func
 
 
 extern int thread_join(thread_t thread, void **retval){
-
-  /*
-  while (exist(thread)){
+  while (thread->retval !=NULL){
     thread_yield();
   }
-
-  remplire(retval,thread)
-  */
+  retval=thread->retval;
+  
   return 0;
 }
 
