@@ -89,42 +89,45 @@ struct element * element_delete(struct element * e)
   return tmp;
 }
 
-void list_element_delete(struct list * l, struct element * e, int(*fct)(struct element *,struct element *))
+void list_element_delete(struct list * l, struct thread * t)
 {
   if(l->first == NULL)
     return;
   if(l->first->next ==NULL)
     {
-      if(fct(l->first,e))
+      if(l->first->thread==t)
 	{
-	  element_delete(l->first);
+	  free(l->first);
+	  l->first = NULL;
 	  l->size =0;
 	  return;
 	}
       return;
     }
-  if(fct(l->first,e))
+  if(l->first->thread ==t)
     {
-      element_delete(l->first);
+      free(l->first);
+      l->first=NULL;
       l->size--;
       return;
     }
   struct element * tmp = l->first;
   while(tmp->next != NULL)
     {
-      if(fct(tmp->next,e))
+      if(tmp->next->thread==t)
 	{
 	  if(tmp->next == l->last)
 	    {
-	      struct element * e = element_delete(tmp->next);
-	      tmp->next = e;
+	      free(tmp->next);
+	      tmp->next = NULL;
 	      l->size--;
 	      l->last = tmp;
 	      return;
 	    }
 	  else
 	    {
-	      struct element * e = element_delete(tmp->next);
+	      struct element * e = tmp->next->next;
+	      free(tmp->next);
 	      tmp->next = e;
 	      l->size--;
 	      return;
@@ -157,20 +160,24 @@ thread_t get_lower_priority_thread(struct list * l)
     return NULL;
   if(l->first == NULL)
     return NULL;
-  if(l->first->next == NULL)
+  if(!l->first->thread->isfinished)
     {
-      e = l->first;
-      l->first = l->first->next;
-      l->size--;
-      l->last = NULL;
+      if(l->first->next == NULL)
+	{
+	  e = l->first;
+	  l->first = l->first->next;
+	  l->size--;
+	  l->last = NULL;
+	}
+      else
+	{
+	  e = l->first;
+	  l->first = l->first->next;
+	  l->size--;
+	}
+      return e->thread;
     }
-  else
-    {
-      e = l->first;
-      l->first = l->first->next;
-      l->size--;
-    }
-  return e->thread;
+  return NULL;
 }
 
 
