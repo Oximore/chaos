@@ -137,16 +137,21 @@ void list_element_delete(struct list * l, struct element * e, int(*fct)(struct e
 
 void print_list(struct list * l)
 {
+  printf("liste :\t");
+  if(l==NULL)
+    return;
   struct element * e = l->first;
   while(e!=NULL)
     {
-      printf("%d\n",e->thread->priority);
+      printf("%p(%d)\t",e->thread,e->thread->isfinished);
       e=e->next;
     }
+  printf("\n");
 }
 
 thread_t get_lower_priority_thread(struct list * l)
 {
+  print_list(l);
   struct element * e; 
   if(l == NULL)
     return NULL;

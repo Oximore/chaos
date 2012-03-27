@@ -3,10 +3,14 @@
 #include <ucontext.h>
 #include "thread.h"
 
-void f(int a)
+void* f(int a)
 {
   printf("%d\n",a);
-  return ;
+  thread_yield();
+  printf("%d\n",a*10);
+  thread_exit(NULL);
+  printf("%d\n",a*100);
+  return NULL;
 }
 
 
@@ -16,11 +20,18 @@ void f(int a)
 int main()
 {
   thread_t t;
-  printf("Hello! \n");
-  thread_create(&t,(void *(*)(void*))&f,(void *)14);
+  thread_t t2;
+  
+  printf("Hello!%s \n","!!!");
+  thread_create(&t,(void *(*)(void*))&f,(void *)10);
   printf("1\n");
-  thread_yield();
+  thread_create(&t2,(void *(*)(void*))&f,(void *)20);
   printf("2\n");
+  thread_yield();
+  printf("3\n");
+  thread_join(t2,NULL);
+  printf("4\n");
+ 
 
 
 

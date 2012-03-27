@@ -11,6 +11,7 @@
 struct thread{
   ucontext_t* context;
   void * retval;
+  int isfinished;
   int isjoined;
   int priority;
 };
