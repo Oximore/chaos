@@ -10,7 +10,8 @@
 // Structures
 struct thread{
   ucontext_t* context;
-  void ** retval;
+  void * retval;
+  int isjoined;
   int priority;
 };
 
@@ -46,7 +47,7 @@ extern int thread_join(thread_t thread, void **retval);
 /* terminer le thread courant en renvoyant la valeur de retour retval.
  * cette fonction ne retourne jamais.
  */
-extern void thread_exit(void *retval) __attribute__ ((__noreturn__));
+extern void thread_exit(void *retval)/* __attribute__ ((__noreturn__))*/;
 
 #endif /* __THREAD_H__ */
 
