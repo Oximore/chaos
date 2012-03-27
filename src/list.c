@@ -82,7 +82,9 @@ struct element * element_init(thread_t t)
 struct element * element_delete(struct element * e)
 {
   struct element * tmp = e->next;
-  thread_delete(e->thread);
+  free(e->thread->context->uc_stack.ss_sp);
+  free(e->thread->context);
+  free(e->thread);
   free(e);
   return tmp;
 }
@@ -164,4 +166,14 @@ thread_t get_lower_priority_thread(struct list * l)
       l->size--;
     }
   return e->thread;
+}
+
+
+int is_empty(struct list * l)
+{
+  if(l==NULL)
+    return -1;
+  if(l->first==NULL)
+    return 1;
+  return 0;
 }

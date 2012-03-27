@@ -22,9 +22,6 @@ typedef struct thread* thread_t;
 
 
 
-// a supprimer (ce prototype)
-void thread_delete(thread_t);
-
 /* recuperer l'identifiant du thread courant.
  */
 extern thread_t thread_self(void);

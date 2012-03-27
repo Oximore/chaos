@@ -27,5 +27,5 @@ struct element * element_init(thread_t );
 struct element * element_delete(struct element * );
 void print_list(struct list * );
 thread_t get_lower_priority_thread(struct list *);
-
+int is_empty(struct list * );
 #endif /* __LIST_H__ */

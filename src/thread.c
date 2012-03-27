@@ -24,7 +24,7 @@ extern thread_t thread_self(void){
 
 void function(void *(func)(void *), void* funcarg){
   // faire gaffe à désalouer
-  (void *) retour = func(funcarg);
+  void * retour = func(funcarg);
   thread_current->retval = retour ;
   
   while(thread_current->isjoined){
@@ -103,7 +103,7 @@ extern int thread_join(thread_t thread, void **retval){
   while (thread->retval == NULL){
     thread_yield();
   }
-  &retval = thread->retval;
+  *retval = thread->retval;
   thread->isjoined = 0;
   //isjoined --; ??
   return 0; // *TODO*
