@@ -5,7 +5,12 @@
 #include "thread.h"
 #include "list.h"
 
-//#define debug(arg) fprintf(STDERR, "%s : %d %d", arg, __truc__, __machin__);
+#define VALEUR_MODE_DEBUG 0
+#ifdef MODE_DEBUG
+#define VALEUR_MODE_DEBUG 1
+#endif
+#define debug(arg) if (VALEUR_MODE_DEBUG) fprintf(stderr, "%s l.%d: %s\n", __FILE__, __LINE__, arg)
+
 
 // Variables Globales
 struct list *thread_list = NULL;
@@ -16,20 +21,20 @@ struct thread *thread_current = NULL;
 //       void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
 //       int swapcontext(ucontext_t *oucp, ucontext_t *ucp);
 
+
+
+
 int thread_delete(struct thread* thread_to_del);
-
-
-
 
 // Fonctions
 extern thread_t thread_self(void) {
-  printf("thread self\n");
+  debug("thread_self");
   return thread_current;
 }
 
 
 void function(void *(func)(void *), void* funcarg) {
-
+  debug("function");
   void * retour = func(funcarg);
   thread_current->retval = retour ;
   thread_current->isfinished = 1;
@@ -50,10 +55,11 @@ void function(void *(func)(void *), void* funcarg) {
 
 
 extern int thread_create(thread_t* new_thread, void *(*func)(void *), void *funcarg) {
+  debug("thread_create");
+  
   if (thread_current == NULL) {
     // Si c'est la première fois qu'on crée un thread
     // On alloue le thread principal
-    printf("1er passage dans thread_create \n");
     struct thread *main_thread = malloc(sizeof(struct thread));
     main_thread->priority = 0;
     main_thread->isfinished = 0;
@@ -68,18 +74,16 @@ extern int thread_create(thread_t* new_thread, void *(*func)(void *), void *func
     main_thread->isjoined = 0;
     thread_current = main_thread;
     
-
     // Puis on crée la thread_list
     thread_list = list_init(); 
   }
   
-  printf("passage dans thread create 2\n");
   *new_thread = malloc(sizeof(struct thread));
   (*new_thread)->priority = 0;
   (*new_thread)->isfinished = 0;
   (*new_thread)->context = malloc(sizeof(ucontext_t));
   getcontext((*new_thread)->context);
-  printf("thread create 3\n");
+
   (*new_thread)->context->uc_stack.ss_size = 64*1024;
   (*new_thread)->context->uc_stack.ss_sp   = malloc((*new_thread)->context->uc_stack.ss_size);
   (*new_thread)->context->uc_link =  NULL; 
@@ -95,27 +99,21 @@ extern int thread_create(thread_t* new_thread, void *(*func)(void *), void *func
 
 // pour le moment sans priorité
 extern int thread_yield (void) {
+  debug("thread_yield");
   // Sauvegarder le contexte courant, charger le suivant et changer le current
-  // printf("thread_yield 1\n");
   thread_t tmp = get_lower_priority_thread(thread_list);
   thread_t current;
-  // printf("thread_yield 2\n");
-  //if (tmp == NULL )
-  //  printf("tmp == NULL\n");
-  
+
   if (tmp != NULL){
     current = thread_current;
     list_add_last(thread_list, thread_current);
     thread_current = tmp; 
     
-    //printf("thread_yield 3 : %p\n",thread_current );
     int i = 0;
     getcontext(current->context);
-    printf("thread_yield 4 : %p\n",thread_current );
     
     if (i==0){
       i++;
-      printf("i = 1 in setcontext \n");
       setcontext(thread_current->context);
     }    
     i = 0;
@@ -126,6 +124,7 @@ extern int thread_yield (void) {
 
 
 extern int thread_join(thread_t thread, void **retval){
+  debug("thread_join");
   thread->isjoined = 1;
   // isjoined ++; pour tous les threads ?
   while (!thread->isfinished)
@@ -144,6 +143,7 @@ extern int thread_join(thread_t thread, void **retval){
 }
 
 int thread_delete(struct thread* thread_to_del){
+  debug("thread_delete");
   free(thread_to_del->context->uc_stack.ss_sp);
   free(thread_to_del->context);
   free(thread_to_del);
@@ -152,8 +152,8 @@ int thread_delete(struct thread* thread_to_del){
 
 //extern void thread_exit(void *retval) __attribute__ ((__noreturn__)){ 
 extern void thread_exit(void *retval){ 
+  debug("thread_exit");
   // Si l'on a jamais appelé thread_create
-  printf("thread_exit\n");
   if (thread_list == NULL)
     exit(0);
   
