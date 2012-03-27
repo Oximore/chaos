@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include "thread.h"
 
-
 struct list 
 {
   struct element * first;
