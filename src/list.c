@@ -154,30 +154,43 @@ void print_list(struct list * l)
 
 thread_t get_lower_priority_thread(struct list * l)
 {
-  print_list(l);
+  //  print_list(l);
   struct element * e; 
-  if(l == NULL)
+  if(l == NULL || l->first == NULL)
     return NULL;
-  if(l->first == NULL)
-    return NULL;
-  if(!l->first->thread->isfinished)
+
+  if(l->first->thread->isfinished)
     {
-      if(l->first->next == NULL)
-	{
-	  e = l->first;
-	  l->first = l->first->next;
-	  l->size--;
-	  l->last = NULL;
-	}
-      else
-	{
-	  e = l->first;
-	  l->first = l->first->next;
-	  l->size--;
-	}
-      return e->thread;
+      struct element * f;
+      e = l->first;
+      if(e->next == NULL)
+	return NULL;
+      while(e->next != NULL || e->next->thread->isfinished)
+	e = e->next;
+      if(e->next==NULL)
+	return NULL;
+      f = e->next;
+      e->next = e->next->next;
+      if (e->next == NULL)
+	l->last = e;
+      l->size--;
+      return f->thread;
     }
-  return NULL;
+  
+  if(l->first->next == NULL)
+    {
+      e = l->first;
+      l->first = l->first->next;
+      l->size--;
+      l->last = NULL;
+    }
+  else
+    {
+      e = l->first;
+      l->first = l->first->next;
+      l->size--;
+    }
+  return e->thread;
 }
 
 

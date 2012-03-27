@@ -3,12 +3,15 @@
 #include <ucontext.h>
 #include "thread.h"
 
+
 void* f(int a)
 {
   printf("%d\n",a);
   thread_yield();
   printf("%d\n",a*10);
+
   thread_exit(NULL);
+  //  thread_yield();
   printf("%d\n",a*100);
   return NULL;
 }
@@ -30,7 +33,8 @@ int main()
   thread_yield();
   printf("3\n");
   thread_join(t2,NULL);
-  printf("4\n");
+  //thread_join(t,NULL);
+  printf("5\n");
  
 
 
