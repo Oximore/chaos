@@ -1,5 +1,6 @@
 #include "list.h"
 #include "thread.h"
+#include "thread_tools.h"
 
 struct list * list_init()
 {
@@ -146,7 +147,7 @@ void print_list(struct list * l)
   struct element * e = l->first;
   while(e!=NULL)
     {
-      printf("%p(%d)\t",e->thread,e->thread->isfinished);
+      printf("%p(%d)\t",e->thread,thread_isfinished(e->thread));//e->thread->isfinished);
       e=e->next;
     }
   printf("\n");
@@ -159,13 +160,13 @@ thread_t get_lower_priority_thread(struct list * l)
   if(l == NULL || l->first == NULL)
     return NULL;
 
-  if(l->first->thread->isfinished)
+  if(thread_isfinished(l->first->thread))
     {
       struct element * f;
       e = l->first;
       if(e->next == NULL)
 	return NULL;
-      while(e->next != NULL || e->next->thread->isfinished)
+      while(e->next != NULL || thread_isfinished(e->next->thread))
 	e = e->next;
       if(e->next==NULL)
 	return NULL;
