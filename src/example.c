@@ -11,9 +11,11 @@ static void * threadfunc(void * arg)
   printf("je suis encore le thread %p, lancé avec l'argument %s\n",
 	 thread_self(), name);
   thread_exit(arg);
+  return NULL;
 }
 
-int main(int argc, char *argv[])
+//int main(int argc, char *argv[])
+int main()
 {
   thread_t thread1, thread2;
   void *retval1, *retval2;

@@ -83,9 +83,7 @@ struct element * element_init(thread_t t)
 struct element * element_delete(struct element * e)
 {
   struct element * tmp = e->next;
-  free(e->thread->context->uc_stack.ss_sp);
-  free(e->thread->context);
-  free(e->thread);
+  thread_delete(e->thread);
   free(e);
   return tmp;
 }

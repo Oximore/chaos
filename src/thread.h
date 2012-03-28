@@ -7,21 +7,10 @@
  *     mais attention aux inconvénient des tableaux de threads
  *     (consommation mémoire, cout d'allocation, ...).
  */
-// Structures
-struct thread{
-  ucontext_t* context;
-  void * retval;
-  int isfinished;
-  int isjoined;
-  int priority;
-};
+
 
 //typedef void* thread_t;
 typedef struct thread* thread_t;
-
-
-
-
 
 /* recuperer l'identifiant du thread courant.
  */
