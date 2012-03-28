@@ -73,6 +73,7 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
     struct thread* main_thread = malloc(sizeof(struct thread));
     main_thread->priority = 0;
     main_thread->isfinished = 0;
+    main_thread->joiner = NULL;
     main_thread->context = malloc(sizeof(ucontext_t));
     getcontext(main_thread->context);
 
@@ -91,6 +92,7 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
   *new_thread = malloc(sizeof(struct thread));
   (*new_thread)->priority = 0;
   (*new_thread)->isfinished = 0;
+  (*new_thread)->joiner = NULL;
   (*new_thread)->context = malloc(sizeof(ucontext_t));
   getcontext((*new_thread)->context);
 
@@ -137,14 +139,17 @@ extern int thread_yield (void) {
 extern int thread_join(struct thread* thread, void **retval){
   debug("thread_join");
   thread->isjoined = 1;
-  // isjoined ++; pour tous les threads ?
-  while (!thread->isfinished)
+  thread->joiner = thread_current;
+  
+  // passer la main
+  while (!thread->isfinished) // supp le while plus tard
     thread_yield();
+  
+
   
   if (retval != NULL)
     *retval = thread->retval;
   thread->isjoined = 0;
-  //isjoined --; ??
   
   // On supprime ce thread
   list_element_delete(thread_list, thread);
@@ -197,12 +202,9 @@ extern void thread_exit(void *retval){
   } 
   thread_current->context = NULL;
     
-  thread_yield();  // Dans le thread_yield on fait le getcontext que si !isfinished
-  // Sinon, il faut changer avec tmp
-  // *TODO* Enlevé cette FU**** duplication de code !!!
-  //thread_delete(thread_current);
-  //thread_current = tmp;
-  //setcontext(thread_current->context);
+  // si thread_current->joiner != NULL lui passer la main ??
+  // Ou 
+  thread_yield();
 } 
 
 int thread_isfinished(struct thread* thread){
