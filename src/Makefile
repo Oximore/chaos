@@ -4,7 +4,9 @@ LDFLAGS=
 EXEC=exe
 EXEC_DEBUG=exe_debug
 
-all: $(EXEC) debug
+all: $(EXEC) 
+
+both: $(EXEC) debug
 
 exe: example.o thread.o list.o
 	$(CC) $(LDFLAGS) $^ -o $(EXEC)
