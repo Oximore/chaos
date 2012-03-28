@@ -14,11 +14,12 @@
 
 // Structures
 struct thread{
+  int priority;
   ucontext_t* context;
   void * retval;
-  int isfinished;
   int isjoined;
-  int priority;
+  struct thread* joiner;
+  int isfinished;
 };
 
 
@@ -119,7 +120,8 @@ extern int thread_yield (void) {
     thread_current = tmp; 
     
     int i = 0;
-    getcontext(current->context);
+    if (!current->isfinished)
+      getcontext(current->context);
     
     if (i==0){
       i++;
@@ -153,10 +155,18 @@ extern int thread_join(struct thread* thread, void **retval){
 
 int thread_delete(struct thread* thread_to_del){
   debug("thread_delete");
-  free(thread_to_del->context->uc_stack.ss_sp);
-  free(thread_to_del->context);
-  free(thread_to_del);
-  return 0;
+  if (thread_to_del != NULL){
+    if (thread_to_del->context != NULL){
+      if (thread_to_del->context->uc_stack.ss_sp != NULL){
+	free(thread_to_del->context->uc_stack.ss_sp);
+      }
+      free(thread_to_del->context);
+    }     
+    free(thread_to_del);
+    return 0;
+  }
+  else
+    return 1;
 }
 
 //extern void thread_exit(void *retval) __attribute__ ((__noreturn__)){ 
@@ -173,16 +183,19 @@ extern void thread_exit(void *retval){
     thread_yield();
   }
   
-  
   struct thread* tmp = get_lower_priority_thread(thread_list);
   // Si il n'y a plus de thread executable, alors c'est la fin
   if ( tmp  == NULL)
     exit(0);
   list_add(thread_list,tmp);
-  
-  //  free(thread_current->context->uc_stack.ss_sp);
-  //free(thread_current->context);
-  //thread_current->context = NULL;
+
+  if (thread_current->context != NULL){
+    if (thread_current->context->uc_stack.ss_sp != NULL){
+      free(thread_current->context->uc_stack.ss_sp);
+    } 
+    free(thread_current->context);
+  } 
+  thread_current->context = NULL;
     
   thread_yield();  // Dans le thread_yield on fait le getcontext que si !isfinished
   // Sinon, il faut changer avec tmp
