@@ -45,8 +45,8 @@ int thread_init(struct thread* thread){
   thread->isfinished = 0;
   thread->joiner = NULL;
   thread->context = malloc(sizeof(ucontext_t));
-  getcontext(thread->context);
-  // Malloc t'on la pile ?
+  getcontext(thread->context); // utile ici ?
+  // Malloc t'on la pile ? si oui (pas par défaut) quelle taille ?
   thread->context->uc_stack.ss_size = 64*1024;
   thread->context->uc_stack.ss_sp   = malloc(thread->context->uc_stack.ss_size);
   thread->context->uc_link =  NULL; 
