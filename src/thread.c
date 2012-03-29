@@ -17,24 +17,20 @@ struct thread{
   int priority;
   ucontext_t* context;
   void * retval;
-  int isjoined;
+  //  int isjoined; // == (joiner != NULL)
   struct thread* joiner;
   int isfinished;
 };
 
 
 // Variables Globales
-struct list* thread_list = NULL;
+struct list* thread_list      = NULL;
 struct thread* thread_current = NULL;
 
-//       int getcontext(ucontext_t *ucp);
-//       int setcontext(const ucontext_t *ucp);
-//       void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
-//       int swapcontext(ucontext_t *oucp, ucontext_t *ucp);
-
-
-int thread_delete(struct thread* thread_to_del);
+// Prototypes des fonctions internes
+int thread_delete_context(struct thread* thread_to_del);
 void function(void *(func)(void *), void* funcarg);
+int thread_init(struct thread* thread);
 
 // Fonctions
 extern struct thread* thread_self(void) {
@@ -43,70 +39,47 @@ extern struct thread* thread_self(void) {
 }
 
 
+int thread_init(struct thread* thread){
+  debug("thread_init");
+  thread->priority = 0;
+  thread->isfinished = 0;
+  thread->joiner = NULL;
+  thread->context = malloc(sizeof(ucontext_t));
+  getcontext(thread->context);
+  // Malloc t'on la pile ?
+  thread->context->uc_stack.ss_size = 64*1024;
+  thread->context->uc_stack.ss_sp   = malloc(thread->context->uc_stack.ss_size);
+  thread->context->uc_link =  NULL; 
+  thread->retval = NULL;
+  return 0;
+}
+
 void function(void *(func)(void *), void* funcarg) {
   debug("function");
   void * retour = func(funcarg);
-  thread_current->retval = retour ;
-  thread_current->isfinished = 1;
- 
-  // Si on l'attend on passe la main et le thread_join le détruira
-  if ( thread_current->isjoined )
-    thread_yield();
-
-  // sinon on le détruit 
-  struct thread* tmp = get_lower_priority_thread(thread_list);
-  
-  if ( tmp == NULL)
-    exit(0);
-  thread_delete(thread_current);
-  thread_current = tmp;
-  setcontext(thread_current->context);
+  thread_exit(retour);
 }
-
 
 extern int thread_create(struct thread** new_thread, void *(*func)(void *), void *funcarg) {
   debug("thread_create");
-  
+  // Si c'est la première fois qu'on crée un thread
   if (thread_current == NULL) {
-    // Si c'est la première fois qu'on crée un thread
     // On alloue le thread principal
     struct thread* main_thread = malloc(sizeof(struct thread));
-    main_thread->priority = 0;
-    main_thread->isfinished = 0;
-    main_thread->joiner = NULL;
-    main_thread->context = malloc(sizeof(ucontext_t));
-    getcontext(main_thread->context);
-
-    // Malloc t'on la pile ?
-    main_thread->context->uc_stack.ss_size = 64*1024;
-    main_thread->context->uc_stack.ss_sp   = malloc(main_thread->context->uc_stack.ss_size);
-    main_thread->context->uc_link =  NULL; 
-    main_thread->retval = NULL;
-    main_thread->isjoined = 0;
+    thread_init(main_thread);
     thread_current = main_thread;
-    
     // Puis on crée la thread_list
     thread_list = list_init(); 
   }
   
   *new_thread = malloc(sizeof(struct thread));
-  (*new_thread)->priority = 0;
-  (*new_thread)->isfinished = 0;
-  (*new_thread)->joiner = NULL;
-  (*new_thread)->context = malloc(sizeof(ucontext_t));
-  getcontext((*new_thread)->context);
-
-  (*new_thread)->context->uc_stack.ss_size = 64*1024;
-  (*new_thread)->context->uc_stack.ss_sp   = malloc((*new_thread)->context->uc_stack.ss_size);
-  (*new_thread)->context->uc_link =  NULL; 
-  (*new_thread)->retval = NULL;
-  (*new_thread)->isjoined = 0;
+  thread_init(*new_thread);
   list_add_last(thread_list,(*new_thread));
-  
-  makecontext((*new_thread)->context, (void (*)(void)) function, 2, (int)func, (int)funcarg);
+  makecontext((*new_thread)->context,
+	      (void (*)(void)) function,
+	      2, (int)func, (int)funcarg);
   return 0;  // *TODO* valeur de retour
 }
-
 
 
 // pour le moment sans priorité
@@ -115,21 +88,19 @@ extern int thread_yield (void) {
   // Sauvegarder le contexte courant, charger le suivant et changer le current
   struct thread* tmp = get_lower_priority_thread(thread_list);
   struct thread* current;
-
+  int i;
   if (tmp != NULL){
     current = thread_current;
     list_add_last(thread_list, thread_current);
     thread_current = tmp; 
     
-    int i = 0;
+    i = 0;
     if (!current->isfinished)
       getcontext(current->context);
-    
     if (i==0){
       i++;
       setcontext(thread_current->context);
-    }    
-    i = 0;
+    }
     return 0;
   }
   return -1;
@@ -138,41 +109,36 @@ extern int thread_yield (void) {
 
 extern int thread_join(struct thread* thread, void **retval){
   debug("thread_join");
-  thread->isjoined = 1;
-  thread->joiner = thread_current;
+  struct thread* current = thread_current;  
+  struct thread* tmp = NULL;
+  int i = 0;
   
-  // passer la main
-  while (!thread->isfinished) // supp le while plus tard
-    thread_yield();
-  
+  // Si le thread n'est pas déjà fini
+  if (!thread->isfinished){
+    thread->joiner = thread_current;
+    // passer la main
+    tmp = get_lower_priority_thread(thread_list);
+    if (tmp == NULL){
+      debug("problème si on attend un thread qui n'existe pas .."); 
+      exit(1);
+    }
+    thread_current = tmp; 
+    i = 0;
+    getcontext(current->context);
+    //debug("une boucle infine ?");
+    if ( i == 0 ){
+      i = 1;
+      setcontext(thread_current->context);
+    }    
+  }
 
-  
+  // Ici on a repris la main
   if (retval != NULL)
     *retval = thread->retval;
-  thread->isjoined = 0;
-  
-  // On supprime ce thread
-  list_element_delete(thread_list, thread);
   thread_delete(thread);
-  
   return 0; // *TODO*
 }
 
-int thread_delete(struct thread* thread_to_del){
-  debug("thread_delete");
-  if (thread_to_del != NULL){
-    if (thread_to_del->context != NULL){
-      if (thread_to_del->context->uc_stack.ss_sp != NULL){
-	free(thread_to_del->context->uc_stack.ss_sp);
-      }
-      free(thread_to_del->context);
-    }     
-    free(thread_to_del);
-    return 0;
-  }
-  else
-    return 1;
-}
 
 //extern void thread_exit(void *retval) __attribute__ ((__noreturn__)){ 
 extern void thread_exit(void *retval){ 
@@ -181,36 +147,56 @@ extern void thread_exit(void *retval){
   if (thread_list == NULL)
     exit(0);
   
-  // Sinon, si on l'attend
+  struct thread* current = thread_current; 
   thread_current->isfinished = 1;
   thread_current->retval = retval;   
-  if (thread_current->isjoined){ 
-    thread_yield();
+  thread_delete_context(thread_current);
+ 
+  // Si on l'attend on passe la main à celui qui attend, sinon à un autre
+  if (current->joiner != NULL){
+    thread_current = current->joiner;
+  } else {
+    thread_current = get_lower_priority_thread(thread_list);
   }
-  
-  struct thread* tmp = get_lower_priority_thread(thread_list);
-  // Si il n'y a plus de thread executable, alors c'est la fin
-  if ( tmp  == NULL)
+  // Si il n'y a plus de thread à exécuter
+  if ( thread_current == NULL)
     exit(0);
-  list_add(thread_list,tmp);
+  setcontext(thread_current->context);    
+}
 
-  if (thread_current->context != NULL){
-    if (thread_current->context->uc_stack.ss_sp != NULL){
-      free(thread_current->context->uc_stack.ss_sp);
-    } 
-    free(thread_current->context);
-  } 
-  thread_current->context = NULL;
-    
-  // si thread_current->joiner != NULL lui passer la main ??
-  // Ou 
-  thread_yield();
-} 
+
+int thread_delete(struct thread* thread_to_del){
+  debug("thread_delete");
+  if (thread_to_del != NULL){
+    thread_delete_context(thread_to_del);
+    free(thread_to_del);
+    return 1;
+  }
+  else return 1;
+}
+
+int thread_delete_context(struct thread* thread_to_del){
+  debug("thread_delete_context");
+  if (thread_to_del != NULL){
+    if (thread_to_del->context != NULL){
+      if (thread_to_del->context->uc_stack.ss_sp != NULL){
+	free(thread_to_del->context->uc_stack.ss_sp);
+      }
+      free(thread_to_del->context);
+      thread_to_del->context = NULL;
+      return 0;
+    }     
+  }
+  return 1;
+}
+
 
 int thread_isfinished(struct thread* thread){
+  debug("thread_isfinished");
   return thread->isfinished;
 }
 
 int thread_getpriority(struct thread* thread){
+  debug("thread_getpriority");
   return thread->priority;
 }

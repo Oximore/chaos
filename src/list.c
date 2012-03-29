@@ -153,7 +153,7 @@ void print_list(struct list * l)
 
 thread_t get_lower_priority_thread(struct list * l)
 {
-  //  print_list(l);
+  //print_list(l);
   struct element * e; 
   if(l == NULL || l->first == NULL)
     return NULL;
