@@ -17,7 +17,6 @@ struct thread{
   int priority;
   ucontext_t* context;
   void * retval;
-  //  int isjoined; // == (joiner != NULL)
   struct thread* joiner;
   int isfinished;
 };
