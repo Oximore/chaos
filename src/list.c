@@ -36,7 +36,7 @@ void list_delete(struct list * l)
   free(l);
 }
 
-void list_add(struct list * l, thread_t t)
+int list_add(struct list * l, thread_t t)
 {
   if(l->first ==NULL)
     {
@@ -52,9 +52,10 @@ void list_add(struct list * l, thread_t t)
       l->first = e;
       l->size++;
     }
+  return 0;
 }
 
-void list_add_last(struct list * l, thread_t t)
+int list_add_last(struct list * l, thread_t t)
 {
   if(l->first ==NULL)
     {
@@ -70,7 +71,13 @@ void list_add_last(struct list * l, thread_t t)
       l->last = e;
       l->size++;
     }
+  return 0;
 }
+
+int data_add(struct list * l, thread_t t){
+  return list_add_last(l,t);
+}
+
 
 struct element * element_init(thread_t t)
 {
