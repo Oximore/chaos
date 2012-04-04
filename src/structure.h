@@ -24,26 +24,34 @@ struct node
   thread_t thread; 
 };
 
+// les delete renvoient une erreur si on tente de supprimer un thread dans une structure vide (mais bien initialisée)
 
+//modifier les fct pour ret erreur
+//init fait
+//add fait
+//delete fait
 struct data * data_init();
-void data_delete(struct data * );
-void data_add(struct data *, thread_t );
+int data_delete(struct data * );
+int data_add(struct data *, thread_t );
 thread_t get_lower_priority_thread(struct data *);
 //thread_t get_lower_priority_thread(struct data *); sans le suppr
-void thread_finished_delete(struct data *, thread_t);
+int thread_finished_delete(struct data *, thread_t);
+
+//int data_create(list ** pointeur);
 
 struct list * list_init();
 struct tree * tree_init();
 struct node * node_init(thread_t);
-void list_delete(struct list * );
-void tree_delete(struct tree * );
-void list_add(struct list *, thread_t );
-void tree_add(struct tree *, thread_t );
+int list_delete(struct list * );
+int tree_delete(struct tree * );
+int list_add(struct list *, thread_t );
+int tree_add(struct tree *, thread_t ); // ne garde pas l'arbre équilibré !
+void tree_add_rec(struct node * , struct node * );
 
-void list_thread_delete(struct list *,thread_t);
+int list_thread_delete(struct list *,thread_t);
 thread_t tree_get(struct tree *);
 
-void node_thread_delete(struct node * );
+int node_thread_delete(struct node * );
 thread_t node_delete(struct node * );
 
 int isleaf(struct node *);
