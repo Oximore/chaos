@@ -31,7 +31,7 @@ int data_add(struct data * d, thread_t t)
 {
   if(d == NULL || d->list == NULL||d->tree == NULL|| t==NULL)
     return -1;
-  if(isfinished(t))
+  if(t->isfinished == 1)//isfinished(t) sera à privilégier dés implémentation
     return list_add(d->list,t);
   else
     return tree_add(d->tree,t);
@@ -142,12 +142,13 @@ int tree_add(struct tree * a, thread_t t)
   if(n==NULL)
     return -1;
   tree_add_rec(a->root,n);
+  balancing(a);
   return 0;
 }
 
 void tree_add_rec(struct node * n, struct node * n2)
 {
-  if(n2->thread->priority > n->thread->priority)
+  if((n2->thread->priority) > (n->thread->priority))
     {
       if(n->right == NULL)
 	{
@@ -200,7 +201,29 @@ int list_thread_delete(struct list * l,thread_t t)
   return node_thread_delete(p);
 }
 
-thread_t tree_get(struct tree *);
+thread_t tree_get(struct tree * t){
+  if(t==NULL)
+    return NULL;
+  thread_t root_value=t->root->thread;
+  if(t->root->left==NULL)
+    t->root=t->root->right;
+  else if(t->root->right==NULL)
+    t->root=t->root->left;
+  else{
+    struct node* cur=t->root->left;
+    struct node tmp;
+    while(cur->right!=NULL)
+      cur=cur->right;
+    t->root->thread=cur->thread;
+    if(cur->left!=NULL){
+      tmp=*cur->left;
+      cur=&tmp;
+      node_thread_delete(cur->left);
+    }
+  }
+  balancing(t);
+  return root_value;
+}
 
 
 thread_t node_delete(struct node * n)
@@ -217,5 +240,50 @@ int isleaf(struct node * n)
   return (n->left==NULL&&n->right==NULL);
 }
 
+int max(int a, int b)
+{
+  return ((a>=b)?a:b);
+
+}
+
+int height(struct node* t){
+  if(t==NULL)
+    return 0;
+  else
+    return 1+max(height(t->left),height(t->right));
+}
+
+struct node* rot_left(struct node* n){
+  struct tree* b=tree_init();
+  b->root=n->right;
+  n->right=b->root->left;
+  b->root->left=n;
+  
+  return b->root;
+
+}
+
+struct node* rot_right(struct node* n){
+  struct tree* b=tree_init();
+  b->root=n->left;
+  n->left=b->root->right;
+  b->root->right=n;
+  return b->root;
+}
+
+void balancing(struct tree* t){
+  int h_left=height(t->root->left);
+  int h_right=height(t->root->right);
+  if((h_left-h_right)==2){
+    if(height(t->root->left->left) <height(t->root->left->right))
+      t->root->left=rot_left(t->root->left);
+    t->root=rot_right(t->root);
+  }
+  if((h_left-h_right)==-2){
+    if(height(t->root->right->right) <height(t->root->right->left))
+      t->root->right=rot_right(t->root->right);
+    t->root=rot_left(t->root);
+  }
+}
 
 

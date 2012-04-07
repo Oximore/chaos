@@ -1,6 +1,8 @@
 #ifndef __STRUCTURE_H__
 #define __STRUCTURE_H__
 
+#include "thread.h"
+
 struct data
 {
   struct list * list;
@@ -56,7 +58,10 @@ thread_t node_delete(struct node * );
 
 int isleaf(struct node *);
 
-
+int height(struct node*);
+struct node* rot_right(struct node*);
+struct node* rot_left(struct node*);
+void balancing(struct tree*);//équilibrage
 
 
 
