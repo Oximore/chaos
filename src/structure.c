@@ -3,6 +3,7 @@
 #include "structure.h"
 #include "thread.h"
 
+
 struct data * data_init()
 {
   struct data * d = malloc(sizeof(struct data));
@@ -141,6 +142,11 @@ int tree_add(struct tree * a, thread_t t)
   struct node * n = node_init(t);
   if(n==NULL)
     return -1;
+  if(a->root == NULL)
+    {
+      a->root = n;
+      return 0;
+    }
   tree_add_rec(a->root,n);
   balancing(a);
   return 0;
@@ -204,9 +210,15 @@ int list_thread_delete(struct list * l,thread_t t)
 
 // en fait petit probleme ici il ne faut pas prendre la racine comme j'ai dit, il faut prendre le min (ce n'est pas la racine, c'est le + a gauche)
 thread_t tree_get(struct tree * t){
-  if(t==NULL)
+  if(t==NULL||t->root==NULL)
     return NULL;
   thread_t root_value=t->root->thread;
+  if(t->root->left==NULL&&t->root->right==NULL)
+    {
+      node_delete(t->root);
+      t->root =NULL;
+      return root_value;
+    }
   if(t->root->left==NULL)
     t->root=t->root->right;
   else if(t->root->right==NULL)

@@ -11,6 +11,7 @@
 //typedef void * thread_t;
 typedef struct thread* thread_t;
 
+int thread_init(struct thread* thread);// a enlever
 // recuperer l'identifiant du thread courant.
 extern thread_t thread_self(void);
 

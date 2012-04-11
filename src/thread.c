@@ -29,7 +29,7 @@ struct thread* thread_current = NULL;
 // Prototypes des fonctions internes
 int thread_delete_context(struct thread* thread_to_del);
 void function(void *(func)(void *), void* funcarg);
-int thread_init(struct thread* thread);
+//int thread_init(struct thread* thread);
 
 
 //

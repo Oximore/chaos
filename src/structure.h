@@ -1,7 +1,14 @@
 #ifndef __STRUCTURE_H__
 #define __STRUCTURE_H__
-
+#include <ucontext.h>
 #include "thread.h"
+struct thread{
+  int priority;
+  ucontext_t* context;
+  void * retval;
+  struct thread* joiner;
+  int isfinished;
+};
 
 struct data
 {
