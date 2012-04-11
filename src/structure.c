@@ -201,6 +201,8 @@ int list_thread_delete(struct list * l,thread_t t)
   return node_thread_delete(p);
 }
 
+
+// en fait petit probleme ici il ne faut pas prendre la racine comme j'ai dit, il faut prendre le min (ce n'est pas la racine, c'est le + a gauche)
 thread_t tree_get(struct tree * t){
   if(t==NULL)
     return NULL;
