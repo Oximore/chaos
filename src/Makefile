@@ -9,13 +9,13 @@ all: $(EXEC)
 
 both: $(EXEC) debug
 
-exe: example.o thread.o list.o
+exe: example.o thread.o structure.o
 	$(CC) $(LDFLAGS) $^ -o $(EXEC)
 
-debug: example_debug.o thread_debug.o list.o
+debug: example_debug.o thread_debug.o structure.o
 	$(CC) $(LDFLAGS) $^ -o $(EXEC_DEBUG) 
 
-fibo: fibo.o thread.o list.o
+fibo: fibo.o thread.o structure.o
 	$(CC) $(LDFLAGS) $^ -o $(EXEC_FIBO)
 
 example.o: thread.h
@@ -27,14 +27,14 @@ example_debug.o: thread.h
 fibo.o: fibo.c thread.h
 	$(CC) $(CFLAGS) -c fibo.c
 
-thread.o: thread.c thread.h list.h
+thread.o: thread.c thread.h structure.h
 	$(CC) $(CFLAGS) -c thread.c
 
-thread_debug.o: thread.c thread.h list.h
+thread_debug.o: thread.c thread.h structure.h
 	$(CC) $(CFLAGS) -DMODE_DEBUG -c thread.c -o $@
 
-list.o: list.c thread.h list.h
-	$(CC) $(CFLAGS) -c list.c
+structure.o: structure.c thread.h structure.h
+	$(CC) $(CFLAGS) -c structure.c
 
 clean:
 	rm -f *.o $(EXEC) $(EXEC_DEBUG) $(EXEC_FIBO) *# *~ 

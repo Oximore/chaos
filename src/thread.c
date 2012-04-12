@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ucontext.h>
+
 #include "thread_tools.h"
-#include "list.h"
+//#include "list.h"
+#include "structure.h"
 // get_lower_priority_thread() and data_add()
 
 #define VALEUR_MODE_DEBUG 0
@@ -23,13 +25,14 @@ struct thread{
 
 
 // Variables Globales
-struct list* thread_list      = NULL;
+//struct list* thread_list      = NULL;
+struct data* thread_data      = NULL;
 struct thread* thread_current = NULL;
 
 // Prototypes des fonctions internes
 int thread_delete_context(struct thread* thread_to_del);
 void function(void *(func)(void *), void* funcarg);
-//int thread_init(struct thread* thread);
+int thread_init(struct thread* thread);
 
 
 //
@@ -81,9 +84,10 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
     if (thread_init(main_thread))
       return -1;
     thread_current = main_thread;
-    // Puis on crée la thread_list
-    thread_list = list_init(); 
-    if (thread_list == NULL)
+    // Puis on crée la thread_data
+    //thread_list = list_init(); 
+    thread_data = data_init();
+    if (thread_data == NULL)
       return -1;
   }
   
@@ -92,7 +96,7 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
     return -1;
   if (thread_init(*new_thread))
     return -1;
-  if (data_add(thread_list,(*new_thread)))
+  if (data_add(thread_data,(*new_thread)))
     return -1;
   
   makecontext((*new_thread)->context,
@@ -106,12 +110,12 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
 extern int thread_yield (void) {
   debug("thread_yield");
   // Sauvegarder le contexte courant, charger le suivant et changer le current
-  struct thread* tmp = get_lower_priority_thread(thread_list);
+  struct thread* tmp = get_lower_priority_thread(thread_data);
   struct thread* current;
   int i;
   if (tmp != NULL){
     current = thread_current;
-    if (data_add(thread_list, thread_current))
+    if (data_add(thread_data, thread_current))
       return -1;
     thread_current = tmp; 
     
@@ -138,13 +142,13 @@ extern int thread_join(struct thread* thread, void **retval){
   // Si l'on a jamais appelé thread_create
   if (thread_current == NULL)
     exit(2); // *TODO*   exit(-1) à la fin
-
+  //print_data(thread_data);
 
   // Si le thread n'est pas déjà fini
   if (!thread->isfinished){
     thread->joiner = thread_current;
     // passer la main
-    tmp = get_lower_priority_thread(thread_list);
+    tmp = get_lower_priority_thread(thread_data);
     if (tmp == NULL){
       debug("problème si on attend un thread qui n'existe pas .."); 
       return -1;
@@ -158,7 +162,7 @@ extern int thread_join(struct thread* thread, void **retval){
       i = 1;
       if (setcontext(thread_current->context))
 	return -1;
-    }    
+    } 
   }
   
   // Ici on a repris la main
@@ -171,7 +175,7 @@ extern int thread_join(struct thread* thread, void **retval){
 
 
   // *TODO* à décommenter plus tard
-  //if (thread_finished_delete(thread_list,thread))
+  //if (thread_finished_delete(thread_data,thread))
   //  return -1;
   
   return 0; 
@@ -182,7 +186,7 @@ extern int thread_join(struct thread* thread, void **retval){
 extern void thread_exit(void *retval){ 
   debug("thread_exit");
   // Si l'on a jamais appelé thread_create
-  if (thread_list == NULL)
+  if (thread_data == NULL)
     exit(0);
   
   struct thread* current = thread_current; 
@@ -194,7 +198,7 @@ extern void thread_exit(void *retval){
   if (current->joiner != NULL){
     thread_current = current->joiner;
   } else {
-    thread_current = get_lower_priority_thread(thread_list);
+    thread_current = get_lower_priority_thread(thread_data);
   }
   // Si il n'y a plus de thread à exécuter
   if ( thread_current == NULL)

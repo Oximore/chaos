@@ -1,14 +1,8 @@
 #ifndef __STRUCTURE_H__
 #define __STRUCTURE_H__
+
 #include <ucontext.h>
-#include "thread.h"
-struct thread{
-  int priority;
-  ucontext_t* context;
-  void * retval;
-  struct thread* joiner;
-  int isfinished;
-};
+#include "thread_tools.h"
 
 struct data
 {
@@ -70,7 +64,8 @@ struct node* rot_right(struct node*);
 struct node* rot_left(struct node*);
 void balancing(struct tree*);//équilibrage
 
-
+void print_data(struct data* d);
+void print_tree(struct node* n, int p);
 
 
 
