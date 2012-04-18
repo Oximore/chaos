@@ -28,8 +28,7 @@ extern int thread_join(thread_t thread, void **retval);
 
 // terminer le thread courant en renvoyant la valeur de retour retval.
 // cette fonction ne retourne jamais.
-extern void thread_exit(void *retval)/* __attribute__ ((__noreturn__))*/;
+extern void thread_exit(void *retval) __attribute__ ((__noreturn__));
 
-int thread_delete(thread_t thread_to_del);
 #endif /* __THREAD_H__ */
 

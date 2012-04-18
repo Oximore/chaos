@@ -12,7 +12,7 @@
 #ifdef MODE_DEBUG
 #define VALEUR_MODE_DEBUG 1
 #endif
-#define debug(arg) if (VALEUR_MODE_DEBUG) fprintf(stderr, "%s l.%d: %s\n", __FILE__, __LINE__, arg)
+#define debug(arg) if (VALEUR_MODE_DEBUG) fprintf(stderr, "%s l.%d:\t%s\n", __FILE__, __LINE__, arg)
 
 // Structures
 struct thread{
@@ -142,7 +142,7 @@ extern int thread_join(struct thread* thread, void **retval){
   // Si l'on a jamais appelé thread_create
   if (thread_current == NULL)
     exit(2); // *TODO*   exit(-1) à la fin
-  //print_data(thread_data);
+  //  print_data(thread_data);
 
   // Si le thread n'est pas déjà fini
   if (!thread->isfinished){
@@ -181,9 +181,8 @@ extern int thread_join(struct thread* thread, void **retval){
   return 0; 
 }
 
-
-//extern void thread_exit(void *retval) __attribute__ ((__noreturn__)){ 
-extern void thread_exit(void *retval){ 
+//extern void thread_exit(void *retval){ 
+extern void thread_exit(void *retval) { 
   debug("thread_exit");
   // Si l'on a jamais appelé thread_create
   if (thread_data == NULL)
@@ -204,6 +203,7 @@ extern void thread_exit(void *retval){
   if ( thread_current == NULL)
     exit(0);
   setcontext(thread_current->context);    
+  exit(-1);
 }
 
 

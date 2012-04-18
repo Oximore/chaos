@@ -1,40 +1,54 @@
-CC=gcc
-CFLAGS= -W -Wall
-LDFLAGS=
-EXEC=exe
-EXEC_DEBUG=exe_debug
-EXEC_FIBO=fibo
+CC         =gcc
+CFLAGS     = -W -Wall
+DEBUGFLAG  = -DMODE_DEBUG 
+DEBUGFLAG  += -g
+LIBFLAG    = -DMODE_PTHREAD
+LDFLAGS    =
+EXEC       =exe
+EXEC_FIBO  =fibo
 
-all: $(EXEC) 
+RECOMPILE  =false
 
-both: $(EXEC) debug
 
-exe: example.o thread.o structure.o
-	$(CC) $(LDFLAGS) $^ -o $(EXEC)
+ifneq ($(pthread),)
+ALLFLAG += $(LIBFLAG)
+LDFLAGS += -lpthread
+endif
 
-debug: example_debug.o thread_debug.o structure.o
-	$(CC) $(LDFLAGS) $^ -o $(EXEC_DEBUG) 
 
-fibo: fibo.o thread.o structure.o
-	$(CC) $(LDFLAGS) $^ -o $(EXEC_FIBO)
+ifneq ($(debug),)
+ALLFLAG += $(DEBUGFLAG)
+endif
 
-example.o: thread.h
-	$(CC) $(CFLAGS) -c example.c
 
-example_debug.o: thread.h
-	$(CC) $(CFLAGS) -c example.c -o $@
 
-fibo.o: fibo.c thread.h
-	$(CC) $(CFLAGS) -c fibo.c
+all: $(EXEC)
 
-thread.o: thread.c thread.h structure.h
-	$(CC) $(CFLAGS) -c thread.c
+exe: example.o thread_mix.o thread.o structure.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC)
 
-thread_debug.o: thread.c thread.h structure.h
-	$(CC) $(CFLAGS) -DMODE_DEBUG -c thread.c -o $@
+fibo: fibo.o thread_mix.o thread.o structure.o 
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_FIBO)
 
-structure.o: structure.c thread.h structure.h
-	$(CC) $(CFLAGS) -c structure.c
+example.o: example.c thread_mix.h 
+	$(CC) $(CFLAGS) $(ALLFLAG) -c example.c 
+
+fibo.o: fibo.c thread_mix.c thread_mix.h 
+	$(CC) $(CFLAGS) $(ALLFLAG) -c fibo.c
+
+thread_mix.o: thread_mix.c thread_mix.h thread.h 
+	$(CC) $(CFLAGS) $(ALLFLAG) -c thread_mix.c
+
+thread.o: thread.c thread.h thread_tools.h  structure.h 
+	$(CC) $(CFLAGS) $(ALLFLAG) -c thread.c
+
+structure.o: structure.c structure.h thread.c thread_tools.h 
+	$(CC) $(CFLAGS) $(ALLFLAG) -c structure.c
 
 clean:
-	rm -f *.o $(EXEC) $(EXEC_DEBUG) $(EXEC_FIBO) *# *~ 
+	-rm -f *.o *# *~ 
+#	clear ; ls
+
+mrproper: clean
+	-rm -f $(EXEC) $(EXEC_FIBO)
+#	clear ; ls
