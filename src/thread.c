@@ -239,5 +239,6 @@ int thread_isfinished(struct thread* thread){
 
 int thread_getpriority(struct thread* thread){
   debug("thread_getpriority");
+  //  print_data(thread_data);
   return thread->priority;
 }

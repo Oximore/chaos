@@ -6,6 +6,7 @@ LIBFLAG    = -DMODE_PTHREAD
 LDFLAGS    =
 EXEC       =exe
 EXEC_FIBO  =fibo
+EXEC_SUM   =sum
 
 RECOMPILE  =false
 
@@ -22,7 +23,7 @@ endif
 
 
 
-all: $(EXEC)
+all: $(EXEC) $(EXEC_FIBO) $(EXEC_SUM)
 
 exe: example.o thread_mix.o thread.o structure.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC)
@@ -30,25 +31,29 @@ exe: example.o thread_mix.o thread.o structure.o
 fibo: fibo.o thread_mix.o thread.o structure.o 
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_FIBO)
 
+sum: sum.o thread_mix.o thread.o structure.o 
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_SUM)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(ALLFLAG) -c $< 
+
 example.o: example.c thread_mix.h 
-	$(CC) $(CFLAGS) $(ALLFLAG) -c example.c 
+
 
 fibo.o: fibo.c thread_mix.c thread_mix.h 
-	$(CC) $(CFLAGS) $(ALLFLAG) -c fibo.c
+
+sum.o: sum.c thread_mix.c thread_mix.h 
 
 thread_mix.o: thread_mix.c thread_mix.h thread.h 
-	$(CC) $(CFLAGS) $(ALLFLAG) -c thread_mix.c
 
 thread.o: thread.c thread.h thread_tools.h  structure.h 
-	$(CC) $(CFLAGS) $(ALLFLAG) -c thread.c
 
 structure.o: structure.c structure.h thread.c thread_tools.h 
-	$(CC) $(CFLAGS) $(ALLFLAG) -c structure.c
 
 clean:
-	-rm -f *.o *# *~ 
+	@-rm -f *.o *# *~ 
 #	clear ; ls
 
 mrproper: clean
-	-rm -f $(EXEC) $(EXEC_FIBO)
+	@-rm -f $(EXEC) $(EXEC_FIBO) $(EXEC_SUM)
 #	clear ; ls

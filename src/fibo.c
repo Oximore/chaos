@@ -37,8 +37,8 @@ void* fibo(void* arg) {
   if (affiche_adresse)   fprintf(stderr,"(%p)",&n);
   if (n==0 || n==1) return (void*)1;
   else {
-    thread_create(&th1,&fibo,(void*)(n-1));
-    thread_create(&th2,&fibo,(void*)(n-2));
+    thread_create(&th1, &fibo, (void*)(n-1));
+    thread_create(&th2, &fibo, (void*)(n-2));
     if (thread_join(th1,(void**)&res1))
       printf("thread_join 1 failed : %d\n", n);
     if (thread_join(th2,(void**)&res2))

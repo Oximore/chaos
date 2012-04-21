@@ -150,6 +150,7 @@ int tree_add(struct tree * a, thread_t t)
   return 0;
 }
 
+
 void tree_add_rec(struct node * n, struct node * n2)
 {
   if((thread_getpriority(n2->thread)) > (thread_getpriority(n->thread)))
@@ -350,7 +351,7 @@ void print_data(struct data* d) {
   } else if (d->tree->root == NULL){
     //printf("Arbre vide\n");
   } else {
-    if (nb_node(d->tree->root) > 10){
+    if (nb_node(d->tree->root) > 0){
       printf("\n**********************\n");
       print_tree(d->tree->root,0);
     }

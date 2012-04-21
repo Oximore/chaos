@@ -1,0 +1,17 @@
+Comment compiler:
+	$ make [<options>] [<programme>]
+
+options :
+	debug=y   : active le mode debug, affichage des appels aux fonctions de la libraisire implémenté.
+	pthread=y : remplace notre librairie par la librairie standard pthread.
+
+programmes :
+	exe  : programme d'exemple donné dans le sujet
+	fibo : programme calculant la somme de fibonnachi associé à l'entier passé en argument
+	sum  : programme calculant la somme d'un tableau de taille passé en agrument et dont les valeurs sont les indices 
+
+l'utilisation de la commande "make" sans argument créer l'ensemble des programmes proposés sans option.
+
+Comment nettoyer:
+	$ make clean    : supprime les binnaires
+	$ make mrproper : supprime les binnaires et les exécutables
