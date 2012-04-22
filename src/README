@@ -4,6 +4,7 @@ Comment compiler:
 options :
 	debug=y   : active le mode debug, affichage des appels aux fonctions de la libraisire implémenté.
 	pthread=y : remplace notre librairie par la librairie standard pthread.
+	time=y    : affiche le temps d'exécution du programme
 
 programmes :
 	exe  : programme d'exemple donné dans le sujet

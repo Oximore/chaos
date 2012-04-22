@@ -1,31 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread.h"
+#include "time.h"
 
 int affiche_adresse = 0;
-int affiche_arg = 1;
+int affiche_arg = 0;
 
 void* fibo(void* arg);
 
 int main(int argc, char* argv[]) {
   int n = 3;
   int res = 0;
+  
+  // Arg Filter
   if (argc>1)
     n = atoi(argv[1]);
+  if (argc>2)
+    affiche_arg = 1;
   if (argc>3)
     affiche_adresse = 1;
-  else if (argc>2)
-    affiche_arg = 0;
-  printf("n = %d\n",n);
-  
-  printf("une idée du tas : %p\n",malloc(sizeof(int)));
 
-  thread_t th;
-  thread_create(&th,&fibo,(void*)(n));
-  if (thread_join(th,(void**)&res))
-    printf("Truuuu\n");
+  printf("n = %d\n",n);
+  if (affiche_adresse)
+    printf("une idée du tas : %p\n",malloc(sizeof(int)));
   
-  printf("\n\tfibo(%d) = %d\n",n,res);
+  time_start(); {
+    thread_t th;
+    thread_create(&th,&fibo,(void*)(n));
+    if (thread_join(th,(void**)&res))
+      printf("Echec de join\n");
+    
+    if (affiche_arg)
+      printf("\n");
+    printf("\tfibo(%d) = %d\n",n,res);
+  }
+  time_end();
   return EXIT_SUCCESS;
 }
 

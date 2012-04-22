@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread_mix.h"
+#include "time.h"
 
 // Structures
 struct indices{
@@ -11,8 +12,8 @@ struct indices{
 
 // Variables globales
 unsigned long int* tableau;
-int affiche_tableau = 1;
-int affiche_arg = 1;
+int affiche_tableau = 0;
+int affiche_arg = 0;
 
 // Prototypes
 void* tab_sum(void* arg);
@@ -22,18 +23,18 @@ void* tab_sum(void* arg);
 int main(int argc, char* argv[])
 {
   unsigned int n = 10, i;
-  
   struct indices indice;
 
+  // Arg Filter
   if (argc > 1)
     n = atoi(argv[1]);
   if (argc > 2)
-    affiche_arg = 0;
+    affiche_tableau = 1;
   if (argc > 3) 
-    affiche_tableau = 0;
+    affiche_arg = 1;
 
   
-  if ( n<=1 ) {
+  if (n<1) {
     perror("Veuillez entrer un entier positif.");
     return 0;
   }
@@ -53,14 +54,17 @@ int main(int argc, char* argv[])
   if (affiche_tableau)
     printf("\n");
   
-  
   indice.a = 0;
   indice.b = n-1;
-  tab_sum((void*) &indice);
   
-  
-  printf("\n\tLa somme des éléments du tableau est égale à : %lu\n", tableau[0]);
-  return EXIT_SUCCESS;	      
+  time_start(); {
+    tab_sum((void*) &indice);
+    if (affiche_arg)
+      printf("\n");
+    printf("\tLa somme des éléments du tableau est égale à : %lu\n", tableau[0]);
+  }
+  time_end();
+return EXIT_SUCCESS;	      
 }
 
 
