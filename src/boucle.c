@@ -8,8 +8,12 @@ int affiche_arg = 0;
 void* boucle(void* arg);
 
 int main(int argc, char* argv[]) {
+  // bricolage pour un make sans warning
+  affiche_arg = (int) argv[0];
   if (argc>1)
     affiche_arg = 1;
+  else
+    affiche_arg = 0;
 
   printf("Création/Destruction de thread de manière infinie.\n");
   time_start(); {

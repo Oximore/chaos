@@ -3,14 +3,20 @@
 #include <stdlib.h>
 #include <ucontext.h>
 
+#ifdef MODE_DEBUG 
+//#include <valgrind/valgrind.h>
+#endif
+
 #include "thread_tools.h"
 #include "structure.h"
 
-#define VALEUR_MODE_DEBUG 0
+
 #ifdef MODE_DEBUG
-#define VALEUR_MODE_DEBUG 1
-#endif
-#define debug(arg) if (VALEUR_MODE_DEBUG) fprintf(stderr, "%s l.%d:\t%s\n", __FILE__, __LINE__, arg)
+#define debug(arg)   fprintf(stderr, "%s l.%d:\t%s\n", __FILE__, __LINE__, arg)
+#else
+#define debug(arg)
+#endif 
+
 
 // Structures
 struct thread{
@@ -19,6 +25,9 @@ struct thread{
   void * retval;
   struct thread* joiner;
   int isfinished;
+  //#ifdef MODE_DEBUG 
+  //int valgrind_stackid;
+  //#endif
 };
 
 
@@ -32,9 +41,6 @@ void function(void *(func)(void *), void* funcarg);
 int thread_init(struct thread* thread);
 int init(void);
 
-
-//    *TODO*
-// -> gérer les appels aux fonctions pour la 1ere fois
 
 // Fonctions
 extern struct thread* thread_self(void) {
@@ -61,6 +67,9 @@ int thread_init(struct thread* thread){
   thread->context->uc_stack.ss_sp   = malloc(thread->context->uc_stack.ss_size);
   if (thread->context->uc_stack.ss_sp == NULL)
     return -1;
+  //#ifdef MODE_DEBUG 
+  //thread->valgrind_stackid VALGRIND_STACK_REGISTER(context.uc_stack.ss_sp, context.uc_stack.ss_sp + context.uc_stack.ss_size);
+  //#endif
   thread->context->uc_link =  NULL; 
   thread->retval = NULL;
   return 0;
@@ -186,7 +195,6 @@ extern void thread_exit(void *retval) {
   struct thread* current = thread_current; 
   thread_current->isfinished = 1;
   thread_current->retval = retval;   
-  // thread_delete_context(thread_current);
  
   // Si on l'attend on passe la main à celui qui attend, sinon à un autre
   if (current->joiner != NULL){
@@ -216,6 +224,9 @@ int thread_delete_context(struct thread* thread_to_del){
   debug("thread_delete_context");
   if (thread_to_del != NULL){
     if (thread_to_del->context != NULL){
+      //#ifdef MODE_DEBUG
+      //VALGRIND_STACK_DEREGISTER(thread_to_del->valgrind_stackid);
+      //#endif
       free(thread_to_del->context->uc_stack.ss_sp);
       free(thread_to_del->context);
       thread_to_del->context = NULL;
@@ -241,3 +252,4 @@ int thread_getpriority(struct thread* thread){
       exit(-1);
   return thread->priority;
 }
+
