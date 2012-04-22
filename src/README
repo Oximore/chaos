@@ -10,7 +10,7 @@ programmes :
 	exe  : programme d'exemple donné dans le sujet
 	fibo : programme calculant la somme de fibonnachi associé à l'entier passé en argument
 	sum  : programme calculant la somme d'un tableau de taille passé en agrument et dont les valeurs sont les indices 
-
+	while: programme qui crée un thread puis le détruit une infinitée de fois (crée pour valgrind)
 l'utilisation de la commande "make" sans argument créer l'ensemble des programmes proposés sans option.
 
 Comment nettoyer:

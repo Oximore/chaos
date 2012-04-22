@@ -7,6 +7,9 @@ LDFLAGS    =
 EXEC       =exe
 EXEC_FIBO  =fibo
 EXEC_SUM   =sum
+EXEC_BOUCLE=while
+
+OBJETS     =thread_mix.o thread.o structure.o time.o
 
 RECOMPILE  =false
 
@@ -25,16 +28,19 @@ ALLFLAG += -DTIME_MODE
 endif
 
 
-all: $(EXEC) $(EXEC_FIBO) $(EXEC_SUM)
+all: $(EXEC) $(EXEC_FIBO) $(EXEC_SUM) $(EXEC_BOUCLE)
 
-exe: example.o thread_mix.o thread.o structure.o time.o
+exe: example.o $(OBJETS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC)
 
-fibo: fibo.o thread_mix.o thread.o structure.o time.o 
+fibo: fibo.o $(OBJETS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_FIBO)
 
-sum: sum.o thread_mix.o thread.o structure.o time.o
+sum: sum.o $(OBJETS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_SUM)
+
+while: boucle.o $(OBJETS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_BOUCLE)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(ALLFLAG) -c $< 
@@ -44,6 +50,8 @@ example.o: example.c thread_mix.h
 fibo.o: fibo.c thread_mix.c thread_mix.h 
 
 sum.o: sum.c thread_mix.c thread_mix.h 
+
+boucle.o: boucle.c thread_mix.c thread_mix.h
 
 thread_mix.o: thread_mix.c thread_mix.h thread.h 
 
@@ -58,5 +66,5 @@ clean:
 #	clear ; ls
 
 mrproper: clean
-	@-rm -f $(EXEC) $(EXEC_FIBO) $(EXEC_SUM)
+	@-rm -f $(EXEC) $(EXEC_FIBO) $(EXEC_SUM) $(EXEC_BOUCLE)
 #	clear ; ls

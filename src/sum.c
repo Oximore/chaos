@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 
   
   if (n<1) {
-    perror("Veuillez entrer un entier positif.");
+    printf("Veuillez entrer un entier positif.\n");
     return 0;
   }
 

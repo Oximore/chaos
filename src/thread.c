@@ -4,9 +4,7 @@
 #include <ucontext.h>
 
 #include "thread_tools.h"
-//#include "list.h"
 #include "structure.h"
-// get_lower_priority_thread() and data_add()
 
 #define VALEUR_MODE_DEBUG 0
 #ifdef MODE_DEBUG
@@ -25,24 +23,25 @@ struct thread{
 
 
 // Variables Globales
-//struct list* thread_list      = NULL;
-struct data* thread_data      = NULL;
+struct data*   thread_data    = NULL;
 struct thread* thread_current = NULL;
 
 // Prototypes des fonctions internes
 int thread_delete_context(struct thread* thread_to_del);
 void function(void *(func)(void *), void* funcarg);
 int thread_init(struct thread* thread);
+int init(void);
 
 
-//
 //    *TODO*
-// -> gérer les valeurs de retours
 // -> gérer les appels aux fonctions pour la 1ere fois
-//
+
 // Fonctions
 extern struct thread* thread_self(void) {
   debug("thread_self");
+  if (thread_current == NULL)
+    if (init())
+      exit(-1);
   return thread_current;
 }
 
@@ -67,6 +66,22 @@ int thread_init(struct thread* thread){
   return 0;
 }
 
+int init(void){
+  // On alloue le thread principal
+  struct thread* main_thread = malloc(sizeof(struct thread));
+  if (main_thread == NULL)
+    return -1;
+  if (thread_init(main_thread))
+    return -1;
+  thread_current = main_thread;
+  
+  // Puis on crée la thread_data
+  thread_data = data_init();
+  if (thread_data == NULL)
+    return -1;
+  return 0;
+}
+
 void function(void *(func)(void *), void* funcarg) {
   debug("function");
   void * retour = func(funcarg);
@@ -76,21 +91,10 @@ void function(void *(func)(void *), void* funcarg) {
 extern int thread_create(struct thread** new_thread, void *(*func)(void *), void *funcarg) {
   debug("thread_create");
   // Si c'est la première fois qu'on crée un thread
-  if (thread_current == NULL) {
-    // On alloue le thread principal
-    struct thread* main_thread = malloc(sizeof(struct thread));
-    if (main_thread == NULL)
-      return -1;
-    if (thread_init(main_thread))
-      return -1;
-    thread_current = main_thread;
-    // Puis on crée la thread_data
-    //thread_list = list_init(); 
-    thread_data = data_init();
-    if (thread_data == NULL)
-      return -1;
-  }
-  
+  if (thread_current == NULL)
+    if (init())
+      exit(-1);
+       
   *new_thread = malloc(sizeof(struct thread));
   if (*new_thread == NULL)
     return -1;
@@ -141,8 +145,7 @@ extern int thread_join(struct thread* thread, void **retval){
   int i = 0;
   // Si l'on a jamais appelé thread_create
   if (thread_current == NULL)
-    exit(2); // *TODO*   exit(-1) à la fin
-  //  print_data(thread_data);
+    exit(-1);
 
   // Si le thread n'est pas déjà fini
   if (!thread->isfinished){
@@ -151,8 +154,7 @@ extern int thread_join(struct thread* thread, void **retval){
     tmp = get_lower_priority_thread(thread_data);
     if (tmp == NULL){
       debug("problème si on attend un thread qui n'existe pas .."); 
-      return -1;
-      //exit(42);
+      exit(-1);
     }
     thread_current = tmp; 
     i = 0;
@@ -170,13 +172,6 @@ extern int thread_join(struct thread* thread, void **retval){
     *retval = thread->retval;
   if (thread_delete(thread))
     return -1;
-  
-  // Pour le moment reste dans la pile si est join plus tard
-
-
-  // *TODO* à décommenter plus tard
-  //if (thread_finished_delete(thread_data,thread))
-  //  return -1;
   
   return 0; 
 }
@@ -221,7 +216,6 @@ int thread_delete_context(struct thread* thread_to_del){
   debug("thread_delete_context");
   if (thread_to_del != NULL){
     if (thread_to_del->context != NULL){
-      //if (thread_to_del->context->uc_stack.ss_sp != NULL){ }
       free(thread_to_del->context->uc_stack.ss_sp);
       free(thread_to_del->context);
       thread_to_del->context = NULL;
@@ -234,11 +228,16 @@ int thread_delete_context(struct thread* thread_to_del){
 
 int thread_isfinished(struct thread* thread){
   debug("thread_isfinished");
+  if (thread_current == NULL)
+    if (init())
+      exit(-1);
   return thread->isfinished;
 }
 
 int thread_getpriority(struct thread* thread){
   debug("thread_getpriority");
-  //  print_data(thread_data);
+  if (thread_current == NULL)
+    if (init())
+      exit(-1);
   return thread->priority;
 }
