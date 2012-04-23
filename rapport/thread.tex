@@ -92,13 +92,29 @@ terminaison du thread correspondant à l'id en paramètre.
 
 Si le thread demandé n'est pas déjà fini alors on se met en attente
 passive en fesant pointer son attribut \textit{joiner} vèrs le thread
-courant avant de changer de thread et in stocker l'ancier dans
+courant avant de changer de thread et de stocker l'ancien dans
 \textit{data}.
 
+Dans le cas où le thread attendu est déjà fini, ou bien après
+l'attente, on récupère la valeur de retour si le second argument n'est
+pas null, puis on désalloue la structure du thread attendu, grace à la
+fonction interne \textit{thread\_delete()}, puisque celui ci est fini.
 
 
 \subsubsection{thread\_exit()}
+Cette fonction interompt le thread courrant.
 
+On fixe la valeur de \textit{isfinished} à $1$, puis on change le
+contexte. Pour celà on recherche un nouveau thread à éxécuter avec la
+fonction \textit{get\_lower\_priority\_thread} ou on sélectionne un
+thread ayant fait un \textit{thread\_join()} sur le thread actuel si
+il en existe.
+
+Dans le cas où la valeur de retour de
+\textit{get\_lower\_priority\_thread} est nulle et qu'il n'y a pas de
+thread ayant fait de join ou bien que c'est le premier appel à une
+fonction de la librairie thread alors on quitte le programme
+normalement avec un appel à \textit{exit(0)}.
 
 
 \subsection{TAD de la structure \textit{data}}
@@ -107,4 +123,16 @@ courant avant de changer de thread et in stocker l'ancier dans
 
 
 \subsection{\textit{mthread}}
-Choisir entre nos fonction et celles de la librairie \textit{pthread}.
+Nous avons implémenté une surcouche à notre librairie pour pouvoir
+facilement l'interchanger avec la librairie \textit{\textless
+ pthread.h\textgreater} de la librairie standard.
+
+Cette surcouche, \textit{mthread\_t}, est implémenté dans
+\textit{thread\_mix.c}.  Elle permet de faire appel aux fonctionx
+définies précédemant en remplaçant \textit{thread\_*} par
+\textit{mthread\_*}. En compilant normalement nos fonctions sont
+appelés, avec la macro pré-procéseur \textit{\# define MODE\_PTHREAD} ce
+sont les fonctions de la librairie standard qui sont appelées.
+
+Grace à cette surcouche nous avons pu comparer les deux implémentations facilement.
+
