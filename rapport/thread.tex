@@ -1,1 +1,110 @@
 % thread.tex
+\subsection{Structure thread}
+\subsubsection{Structure}
+
+\begin{verbatim}
+struct thread{
+  int priority;
+  ucontext_t* context;
+  void * retval;
+  struct thread* joiner;
+  int isfinished;
+};
+\end{verbatim}
+
+\subsubsection{priority}
+Entier fixant la prioritée d'exécution du thread. Pour le moment il
+n'est pas utilisé.  Il devra être géré par les fonctions internes de
+la structure \textit{data}.
+
+\subsubsection{context}
+Structure de la librairie \textit{\textless
+ucontext.h\textgreater}. Sert à sauver notre contexte.
+ 
+\subsubsection{retval}
+Pointeur vers la valeur de retour du thread. Vaut $NULL$ tant qu'elle
+n'a pas été remplie.
+
+\subsubsection{joiner}
+Si on autre thread attend celui ci à l'aide de la fonction
+\textit{thread\_join} alors il sera pointé par cette variable.
+
+\subsubsection{isfinished}
+Cet entier peut prendre la valeur $0$ dans le cas où le thread n'a pas
+fini son éxécution, $1$ dans le cas contraire.
+
+
+\subsection{Variables globales}
+Pour pouvoir implémenter notre librairie nous avons fait le choix de
+définir deux variables globales.
+\begin{verbatim}
+struct data*   thread_data;
+struct thread* thread_current;
+\end{verbatim}
+\textit{thread\_data} correspond à une structure de donnée que nous
+détaillerons plus tard. Il faut savoir que c'est la que sont stocké
+les threads qui ne sont pas en cours.  \textit{thread\_current} est,
+comme son nom l'indique, la structure qui contient les informations
+sur le thread courrant.
+
+\subsection{Fonction de la librairie}
+Nous avons implémenté les fonctions dont le prototype est fournit dans
+le fichier \textit{thread.h} du sujet. Voici leur différente manière
+de fonctioner.
+
+\subsubsection{thread\_self()}
+Cette fonction renvoie l'identifiant de thread. Ce dernier est définit
+par l'adresse dans la pile de la structure thread correspondante.
+% Celle ci est unique puisque à une adresse dans la pile ne peut
+% correspondre qu'un même objet
+Cas particulier de fonctionnement : si c'est la première fois que l'on
+appelle une fonction de la librairie alors une structure thread est
+crée pour le thread principal et l'objet \textit{thread\_data} est
+initialisé.
+
+\subsubsection{thread\_create()}
+Cette fonction aloue et initialise une structure thread et son
+contexte à l'aide de la fonction auxiliaire interne
+\textit{thread\_init}.  Cette structure est ensuite stocker dans la
+variable \textit{thread\_data}.
+
+De même que la fonction précédente si c'est le
+premier appel à une fonction de la librairie.
+
+
+
+\subsubsection{thread\_yield()}
+Cette fonction passe la main à un autre thread si possible. Elle
+extrait un thread de \textit{thread\_data} grace à la fonction
+\textit{get\_lower\_priority\_thread()}. Un échange de contexte est
+ensuite fait pour que le thread courrant ce retrouve dans
+\textit{thread\_data} et que le thread retirer soit éxécuté.
+
+Si la valeur de retour de \textit{get\_lower\_priority\_thread()} est
+nulle, alors soit \textit{thread\_data} n'a jamais été initialisé
+($i.e.$ c'est le premier appel à une fonction de la lib), soit il n'y
+a pas d'autre thread en attente d'être éxécuté. Dans les deux cas
+aucun changement de context n'est fait.
+
+\subsubsection{thread\_join()}
+Cette fonction met en pause le thread courant en attendant la
+terminaison du thread correspondant à l'id en paramètre.
+
+Si le thread demandé n'est pas déjà fini alors on se met en attente
+passive en fesant pointer son attribut \textit{joiner} vèrs le thread
+courant avant de changer de thread et in stocker l'ancier dans
+\textit{data}.
+
+
+
+\subsubsection{thread\_exit()}
+
+
+
+\subsection{TAD de la structure \textit{data}}
+
+
+
+
+\subsection{\textit{mthread}}
+Choisir entre nos fonction et celles de la librairie \textit{pthread}.
