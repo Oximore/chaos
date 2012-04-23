@@ -1,35 +1,117 @@
-\documentclass[a4paper,11pt]{report}
-
+\documentclass[a4paper
+,oneside,11pt]{article}
 \usepackage[french]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{fullpage}
+\usepackage{xkeyval}
+\usepackage{rotating}
+\usepackage{amsmath}
+\usepackage{amsfonts,amssymb}
+\usepackage{float}
+\usepackage{fancyhdr}
 \usepackage{graphicx}
-\usepackage[colorlinks=true]{hyperref}
-\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
-%%%%%%%%%%%%%%%% Lengths %%%%%%%%%%%%%%%%
-\setlength{\textwidth}{15.5cm}
-\setlength{\evensidemargin}{0.5cm}
-\setlength{\oddsidemargin}{0.5cm}
+\usepackage{verbatim}
+\usepackage{lastpage}
+\usepackage{pstricks}
+%\usepackage{aeguill}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{mathenv}
+\usepackage{amssymb}
+\setlength{\headsep}{0.70cm}
 
 %%%%%%%%%%%%%%%% Variables %%%%%%%%%%%%%%%%
+\def\titre{Rapport\\Projet de système d'exploitation :\\Librairie de threads}
+\def\titregauche{Projet OS}
+\def\titredroite{Rapport de projet}
+\def\filiere{informatique}
+\def\annee{$2^{eme}$}
+\def\anneescolaire{2011/2012}
+\def\equipe{Benjamin Lux \\ Guillaume Boutin \\ Papa Maguey \\ Thibaud Cheippe}
+\def\encadrant{Brice Goglin}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Projet Système : Gestion de threads}
-\author{Thibaud Cheippe, Lux Benjamin, Boutin Guillaume, Papa Gueye}
 
+\pagestyle{fancy} \lhead{\textsc{\titregauche}} 
+\rfoot{\textit{Ann\'ee \anneescolaire}}\rhead{\textsc{\titredroite}}\cfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+
+\begin{center}
 
 
+% Upper part of the page
+\begin{center}
+\rotatebox{0}{\scalebox{1}[1]{\includegraphics[width=5cm]{images/Logo_ENSEIRB-MATMECA.png}}}
+\end{center}
+~\\
+~\\
+~\\
+\textsc{\LARGE ENSEIRB-MATMECA}\\[1cm]
 
-%%%%%%%%%%%%%%%% Main part %%%%%%%%%%%%%%%%
-\section*{Introduction}
+\textsc{\Large {Fili\`ere \filiere, \annee ann\'ee}}\\[0.5cm]
 
-Le but de ce projet est de coder en C une bibliothèque de threads en espace utilisateur. Nous avons commencé par nous familiariser avec les mécanismes de changement de contexte en exécutant le programme fourni en exemple, puis nous l'avons modifié pour mieux comprendre le comportement des threads lors des changements de contexte. Nous avons implémenté une structure de données pour gérer les threads, et avons codé les premières fonctions de manipulation de threads.
+% Title
+\HRule \\[0.4cm]
+{ \huge \bfseries \titre}\\[0.4cm]
 
-\section*{Base de donnée} 
-\input{structure.tex}
 
-\section*{Fonctions sur les Threads}
-\input{thread.tex}
+\HRule \\[1.5cm]
+
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Auteurs:}\\
+\equipe
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Encadrant:} \\
+\encadrant
+\end{flushright}
+\end{minipage}
+
+
+\vfill
+
+% Bottom of the page
+{\large \today}
+
+\end{center}
+
+\end{titlepage}
+%\tableofcontents\thispagestyle{fancy}
+\newpage
+
+
+\section*{Introduction}\thispagestyle{fancy}
+\addcontentsline{toc}{section}{Introduction}
+\input{intro}
+
+
+\section{Implémentation de la librairie}
+\input{thread}
+
+\section{Test fonctionnels et de performance}
+\input{test}
+
+
+\section*{Conclusion}\thispagestyle{fancy}
+\addcontentsline{toc}{section}{Conclusion}
+
+\input{conclusion}
+
+%\section{Glossaire}
+%\include{glossaire.tex}
 
 \end{document}
+
