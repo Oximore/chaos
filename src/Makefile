@@ -1,8 +1,9 @@
 CC         =gcc
 CFLAGS     = -W -Wall
-DEBUGFLAG  = -DMODE_DEBUG 
-DEBUGFLAG  += -g
-LDFLAGS    =
+DEBUGFLAG  = -DMODE_DEBUG
+LDFLAGS    = -g
+ALLFLAG    =
+
 
 EXEC       =exe
 EXEC_FIBO  =fibo
@@ -21,6 +22,10 @@ endif
 
 ifneq ($(debug),)
 ALLFLAG += $(DEBUGFLAG)
+endif
+
+ifneq ($(valgrind),)
+ALLFLAG += -g
 endif
 
 ifneq ($(time),)
@@ -43,7 +48,7 @@ while: boucle.o $(OBJETS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $(EXEC_BOUCLE)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(ALLFLAG) -c $< 
+	$(CC) $(CFLAGS) $(LDFLAGS) $(ALLFLAG) -c $< 
 
 example.o: example.c thread_mix.h 
 
