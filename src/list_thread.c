@@ -1,95 +1,97 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "list_thread.h"
+ #include "list_thread.h"
 
-/*** struct list ***/
-
-struct list* list_init(void) {
-  struct list* l = malloc(sizeof(struct list));
-  if (l != NULL) {
-    l->first = NULL;
-    l->last = NULL;
-  }
+struct list * list_init()
+{
+  struct list * l = malloc(sizeof(struct list));
+  l->first = NULL;
+  l->last = NULL;
   return l;
 }
 
-// free thread
-int list_delete(struct list* l) {
-  struct element* e,* f;
-  if (l != NULL) {
-    e = l->first;
-    while (e != NULL){
-      f = e->next;
-      thread_delete(e->thread);
-      free(e);
-      e = f;
-    }
-    free(l);
-  }
-  return 0;
-}
-
-// add in first
-int list_add(struct list* l, thread_t t) {
-  if (l == NULL || t == NULL) {
+int list_delete(struct list * l)
+{
+  if(l ==NULL)
     return -1;
-  }
-  if (!thread_isfinished(t)) {
-    struct element* e = element_new(t);
-    if (e == NULL)
-      return -1;
-    
-    if (l->first == NULL) {
-      l->last = e;
-    } else {
-      l->first->previous = e;
+  if(l->first == NULL)
+    {
+      free(l);
+      return 0;
     }
-    e->next = l->first;
-    l->first = e;
-  }
+  if(l->first->next == NULL)
+    {
+      element_delete(l->first->next);
+      free(l);
+      return -1;
+    }
+  struct element * tmp = l->first;
+  while(tmp->next != NULL)
+    {
+      tmp = tmp->next;
+      element_delete(l->first);
+      l->first = tmp;
+    }
+  free(l);
   return 0;
 }
 
-// get in last
-thread_t list_get(struct list* l) {
-  struct element* e;
-  thread_t t;
-  if (l == NULL || l->last == NULL)
+
+
+int list_add(struct list * l, thread_t t)
+{
+  if(!thread_isfinished(t))
+    {
+      if(l->first ==NULL)
+	{
+	  struct element * e = element_init(t);
+	  l->last = e;
+	  l->first = e;
+	}
+      else
+	{
+	  struct element * e = element_init(t);
+	  l->last->next = e;
+	  l->last = e;
+	}
+    }
+  return 0;
+}
+
+thread_t list_get(struct list * l)
+{
+  struct element * e;
+   if (l == NULL || l->first == NULL)
     return NULL;
-  
-  if (l->last->previous != NULL) {
-    l->last->previous->next = NULL;
-  } else {
-    l->first = NULL;  
-  }
-  
-  e = l->last;
-  l->last = l->last->previous;
-  t = e->thread;
-  element_delete(e);
-  
-  return t;
+   if(l->first->next ==NULL)
+     {
+       e = l->first;
+       l->first =NULL;
+       l->last = NULL;
+       return e->thread;
+     }
+   e = l->first;
+   l->first = l->first->next;
+   return e->thread;
 }
 
 
 
-
-/*** struct element ***/
-struct element* element_new(thread_t t) {
-  struct element* e = malloc(sizeof(struct element));
-  if (e != NULL) {
-    e->previous = NULL;
-    e->next     = NULL;
-    e->thread   = t;
-  }
+struct element * element_init(thread_t t)
+{
+  struct element * e = malloc(sizeof(struct element));
+  e->next = NULL;
+  e->thread = t;
   return e;
 }
 
-// don't free the thread_t structure
-int element_delete(struct element* e) {
+struct element * element_delete(struct element * e)
+{
+  struct element * tmp = e->next;
+  thread_delete(e->thread);
   free(e);
-  return 0;
+  return tmp;
 }
+
+
 
 /*** debug functions ***/
 void list_print(struct list* l) {
