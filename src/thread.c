@@ -11,15 +11,8 @@
 #include "structure.h"
 
 
-#ifdef MODE_DEBUG
-#define debug(arg)   fprintf(stderr, "%s l.%d:\t%s\n", __FILE__, __LINE__, arg)
-#else
-#define debug(arg)
-#endif 
-
-
 // Structures
-struct thread{
+struct thread {
   int priority;
   ucontext_t* context;
   void * retval;
@@ -32,7 +25,7 @@ struct thread{
 
 
 // Variables Globales
-struct data*   thread_data    = NULL;
+structure      thread_set     = NULL;
 struct thread* thread_current = NULL;
 
 // Prototypes des fonctions internes
@@ -44,7 +37,7 @@ int init(void);
 
 // Fonctions
 extern struct thread* thread_self(void) {
-  debug("thread_self");
+  //debug();
   if (thread_current == NULL)
     if (init())
       exit(-1);
@@ -53,7 +46,7 @@ extern struct thread* thread_self(void) {
 
 
 int thread_init(struct thread* thread){
-  debug("thread_init");
+  //debug();
   thread->priority = 0;
   thread->isfinished = 0;
   thread->joiner = NULL;
@@ -84,21 +77,21 @@ int init(void){
     return -1;
   thread_current = main_thread;
   
-  // Puis on crée la thread_data
-  thread_data = data_init();
-  if (thread_data == NULL)
+  // Puis on crée la thread_set
+  thread_set = structure_init();
+  if (thread_set == NULL)
     return -1;
   return 0;
 }
 
 void function(void *(func)(void *), void* funcarg) {
-  debug("function");
+  //debug();
   void * retour = func(funcarg);
   thread_exit(retour);
 }
 
 extern int thread_create(struct thread** new_thread, void *(*func)(void *), void *funcarg) {
-  debug("thread_create");
+  //debug();
   // Si c'est la première fois qu'on crée un thread
   if (thread_current == NULL)
     if (init())
@@ -109,7 +102,7 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
     return -1;
   if (thread_init(*new_thread))
     return -1;
-  if (data_add(thread_data,(*new_thread)))
+  if (structure_add(thread_set,(*new_thread)))
     return -1;
   
   makecontext((*new_thread)->context,
@@ -121,14 +114,14 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
 
 // pour le moment sans priorité
 extern int thread_yield (void) {
-  debug("thread_yield");
+  //debug();
   // Sauvegarder le contexte courant, charger le suivant et changer le current
-  struct thread* tmp = get_lower_priority_thread(thread_data);
+  struct thread* tmp = structure_get(thread_set);
   struct thread* current;
   int i;
   if (tmp != NULL){
     current = thread_current;
-    if (data_add(thread_data, thread_current))
+    if (structure_add(thread_set, thread_current))
       return -1;
     thread_current = tmp; 
     
@@ -148,7 +141,7 @@ extern int thread_yield (void) {
 
 
 extern int thread_join(struct thread* thread, void **retval){
-  debug("thread_join");
+  //debug();
   struct thread* current = thread_current;  
   struct thread* tmp = NULL;
   int i = 0;
@@ -156,13 +149,16 @@ extern int thread_join(struct thread* thread, void **retval){
   if (thread_current == NULL)
     exit(-1);
 
+  //print_data(thread_set);
+  
   // Si le thread n'est pas déjà fini
   if (!thread->isfinished){
     thread->joiner = thread_current;
     // passer la main
-    tmp = get_lower_priority_thread(thread_data);
+    tmp = structure_get(thread_set);
     if (tmp == NULL){
-      debug("problème si on attend un thread qui n'existe pas .."); 
+      //debug(); 
+      fprintf(stderr, "%s l.%d:\t%s\n", __FILE__, __LINE__, "Problème si l'on attends un thread qui n'existe pas");
       exit(-1);
     }
     thread_current = tmp; 
@@ -187,9 +183,9 @@ extern int thread_join(struct thread* thread, void **retval){
 
 //extern void thread_exit(void *retval){ 
 extern void thread_exit(void *retval) { 
-  debug("thread_exit");
+  //debug();
   // Si l'on a jamais appelé thread_create
-  if (thread_data == NULL)
+  if (thread_set == NULL)
     exit(0);
   
   struct thread* current = thread_current; 
@@ -200,7 +196,7 @@ extern void thread_exit(void *retval) {
   if (current->joiner != NULL){
     thread_current = current->joiner;
   } else {
-    thread_current = get_lower_priority_thread(thread_data);
+    thread_current = structure_get(thread_set);
   }
   // Si il n'y a plus de thread à exécuter
   if ( thread_current == NULL)
@@ -211,7 +207,7 @@ extern void thread_exit(void *retval) {
 
 
 int thread_delete(struct thread* thread_to_del){
-  debug("thread_delete");
+  //debug();
   if (thread_to_del != NULL){
     thread_delete_context(thread_to_del);
     free(thread_to_del);
@@ -221,7 +217,7 @@ int thread_delete(struct thread* thread_to_del){
 }
 
 int thread_delete_context(struct thread* thread_to_del){
-  debug("thread_delete_context");
+  //debug();
   if (thread_to_del != NULL){
     if (thread_to_del->context != NULL){
       //#ifdef MODE_DEBUG
@@ -238,7 +234,7 @@ int thread_delete_context(struct thread* thread_to_del){
 
 
 int thread_isfinished(struct thread* thread){
-  debug("thread_isfinished");
+  //debug();
   if (thread_current == NULL)
     if (init())
       exit(-1);
@@ -246,7 +242,7 @@ int thread_isfinished(struct thread* thread){
 }
 
 int thread_getpriority(struct thread* thread){
-  debug("thread_getpriority");
+  //debug();
   if (thread_current == NULL)
     if (init())
       exit(-1);

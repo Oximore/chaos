@@ -10,7 +10,7 @@ EXEC_FIBO  =fibo
 EXEC_SUM   =sum
 EXEC_BOUCLE=while
 
-OBJETS     =thread_mix.o thread.o structure.o time.o
+OBJETS     =thread_mix.o thread.o structure.o time.o tree_thread.o list_thread.o
 
 RECOMPILE  =false
 
@@ -31,6 +31,11 @@ endif
 ifneq ($(time),)
 ALLFLAG += -DTIME_MODE
 endif
+
+ifneq ($(list),)
+ALLFLAG += -DMODE_LIST
+endif
+
 
 
 all: $(EXEC) $(EXEC_FIBO) $(EXEC_SUM) $(EXEC_BOUCLE)
@@ -60,9 +65,13 @@ boucle.o: boucle.c thread_mix.c thread_mix.h
 
 thread_mix.o: thread_mix.c thread_mix.h thread.h 
 
-thread.o: thread.c thread.h thread_tools.h  structure.h 
+thread.o: thread.c thread.h thread_tools.h structure.h 
 
-structure.o: structure.c structure.h thread.c thread_tools.h 
+structure.o: structure.c structure.h tree_thread.h list_thread.h
+
+tree_thread.o: tree_thread.c tree_thread.h thread.c thread_tools.h  
+
+list_thread.o: list_thread.c list_thread.h thread.c thread_tools.h 
 
 time.o: time.c time.h
 
