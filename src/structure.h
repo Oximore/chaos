@@ -24,6 +24,7 @@ struct node
 {
   struct node * left;
   struct node * right;
+  struct node * root;
   thread_t thread; 
 };
 
@@ -62,7 +63,8 @@ int isleaf(struct node *);
 int height(struct node*);
 struct node* rot_right(struct node*);
 struct node* rot_left(struct node*);
-void balancing(struct tree*);//équilibrage
+void balancing(struct node**);//équilibrage
+void balance(struct node**);
 
 void print_data(struct data* d);
 void print_tree(struct node* n, int p);
