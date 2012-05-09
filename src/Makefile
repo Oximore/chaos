@@ -1,7 +1,7 @@
 CC         =gcc
 CFLAGS     = -W -Wall
 DEBUGFLAG  = -DMODE_DEBUG
-LDFLAGS    = -g
+LDFLAGS    = 
 ALLFLAG    =
 
 
