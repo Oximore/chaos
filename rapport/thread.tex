@@ -1,9 +1,12 @@
 % thread.tex
 \subsection{Structure thread}
+Voici l'implémentation de la structure d'un thread ainsi que ces
+différents attributs.
+
 \subsubsection{Structure}
 
 \begin{verbatim}
-struct thread{ 
+struct thread { 
  int priority;
  ucontext_t* context; 
  void * retval;
@@ -88,11 +91,11 @@ extrait un thread de \textit{thread\_set} grâce à la fonction
 ensuite fait pour que le thread courrant ce retrouve dans
 \textit{thread\_set} et que le thread retiré soit exécuté.
 
-Si la valeur de retour de \textit{structure\_get()} est
-nulle, alors soit \textit{thread\_set} n'a jamais été initialisé
-($i.e.$ c'est le premier appel à une fonction de la lib), soit il n'y
-a pas d'autre thread en attente d'exécution. Dans les deux cas
-aucun changement de context n'est fait.
+Si la valeur de retour de \textit{structure\_get()} est nulle, alors
+soit \textit{thread\_set} n'a jamais été initialisé ($i.e.$ c'est le
+premier appel à une fonction de la lib), soit il n'y a pas d'autre
+thread en attente d'exécution. Dans les deux cas aucun changement de
+context n'est fait.
 
 \subsubsection{thread\_join()}
 Cette fonction met en pause le thread courant en attendant la
@@ -118,24 +121,25 @@ fonction \textit{structure\_get} ou on sélectionne un
 thread ayant fait un \textit{thread\_join()} sur le thread actuel si
 il en existe.
 
-Dans le cas où la valeur de retour de
-\textit{structure\_get} est nulle et qu'il n'y a pas de
-thread ayant fait de \textit{join} ou bien que c'est le premier appel à une
-fonction de la librairie thread alors on quitte le programme
-normalement avec un appel à \textit{exit(0)}.
+Dans le cas où la valeur de retour de \textit{structure\_get} est
+nulle et qu'il n'y a pas de thread ayant fait de \textit{join} ou bien
+que c'est le premier appel à une fonction de la librairie thread alors
+on quitte le programme normalement avec un appel à \textit{exit(0)}.
 
 
 \subsection{\textit{mthread}}
 Nous avons implémenté une surcouche à notre librairie pour pouvoir
 facilement l'interchanger avec la librairie \textit{\textless
- pthread.h\textgreater} de la librairie standard.
+  pthread.h\textgreater} de la librairie standard.
 
 Cette surcouche, \textit{mthread\_t}, est implémentée dans
 \textit{thread\_mix.c}.  Elle permet de faire appel aux fonctions
 définies précédemment en remplaçant \textit{thread\_*} par
 \textit{mthread\_*}. En compilant normalement, nos fonctions sont
-appelées, avec la macro pré-processeur \textit{\# define MODE\_PTHREAD} ce
-sont les fonctions de la librairie standard qui sont appelées.
+appelées, avec la macro pré-processeur \textit{\# define
+  MODE\_PTHREAD} ce sont les fonctions de la librairie standard qui
+sont appelées.
 
-Grâce à cette surcouche nous avons pu comparer les deux implémentations facilement.
+Grâce à cette surcouche nous avons pu comparer les deux
+implémentations facilement.
 

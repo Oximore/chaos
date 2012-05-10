@@ -17,6 +17,6 @@ typedef struct tree* structure;
 
 structure structure_init ();
 int       structure_add  (structure, thread_t);
-void      structure_print(structure);
 thread_t  structure_get  (structure);
+void      structure_print(structure);
 #endif

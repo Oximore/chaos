@@ -16,5 +16,5 @@ programmes :
 l'utilisation de la commande "make" sans argument créer l'ensemble des programmes proposés sans option.
 
 Comment nettoyer:
-	$ make clean    : supprime les binnaires
-	$ make mrproper : supprime les binnaires et les exécutables
+	$ make clean    : supprime les binnaires.
+	$ make mrproper : supprime les binnaires et les exécutables.

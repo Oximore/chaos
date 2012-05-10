@@ -37,7 +37,6 @@ int init(void);
 
 // Fonctions
 extern struct thread* thread_self(void) {
-  //debug();
   if (thread_current == NULL)
     if (init())
       exit(-1);
@@ -46,22 +45,20 @@ extern struct thread* thread_self(void) {
 
 
 int thread_init(struct thread* thread){
-  //debug();
   thread->priority = 0;
   thread->isfinished = 0;
   thread->joiner = NULL;
   thread->context = malloc(sizeof(ucontext_t));
   if (thread->context == NULL)
     return -1;
-  if (getcontext(thread->context)) // utile ici ?
+  if (getcontext(thread->context))
     return -1;
-  // Malloc t'on la pile ? si oui (pas par défaut) quelle taille ?
   thread->context->uc_stack.ss_size = 64*1024;
   thread->context->uc_stack.ss_sp   = malloc(thread->context->uc_stack.ss_size);
   if (thread->context->uc_stack.ss_sp == NULL)
     return -1;
   //#ifdef MODE_DEBUG 
-  //thread->valgrind_stackid VALGRIND_STACK_REGISTER(context.uc_stack.ss_sp, context.uc_stack.ss_sp + context.uc_stack.ss_size);
+  //thread->valgrind_stackid VALGRIND_STACK_REGISTER(thread->context.uc_stack.ss_sp, thread->context.uc_stack.ss_sp + thread->context.uc_stack.ss_size);
   //#endif
   thread->context->uc_link =  NULL; 
   thread->retval = NULL;
@@ -77,7 +74,7 @@ int init(void){
     return -1;
   thread_current = main_thread;
   
-  // Puis on crée la thread_set
+  // Puis on crée le thread_set
   thread_set = structure_init();
   if (thread_set == NULL)
     return -1;
@@ -85,13 +82,11 @@ int init(void){
 }
 
 void function(void *(func)(void *), void* funcarg) {
-  //debug();
   void * retour = func(funcarg);
   thread_exit(retour);
 }
 
 extern int thread_create(struct thread** new_thread, void *(*func)(void *), void *funcarg) {
-  //debug();
   // Si c'est la première fois qu'on crée un thread
   if (thread_current == NULL)
     if (init())
@@ -114,7 +109,6 @@ extern int thread_create(struct thread** new_thread, void *(*func)(void *), void
 
 // pour le moment sans priorité
 extern int thread_yield (void) {
-  //debug();
   // Sauvegarder le contexte courant, charger le suivant et changer le current
   struct thread* tmp = structure_get(thread_set);
   struct thread* current;
@@ -141,7 +135,6 @@ extern int thread_yield (void) {
 
 
 extern int thread_join(struct thread* thread, void **retval){
-  //debug();
   struct thread* current = thread_current;  
   struct thread* tmp = NULL;
   int i = 0;
@@ -149,15 +142,14 @@ extern int thread_join(struct thread* thread, void **retval){
   if (thread_current == NULL)
     exit(-1);
 
-  //print_data(thread_set);
+  //structure_print(thread_set);
   
   // Si le thread n'est pas déjà fini
-  if (!thread->isfinished){
+  if (!thread->isfinished) {
     thread->joiner = thread_current;
     // passer la main
     tmp = structure_get(thread_set);
     if (tmp == NULL){
-      //debug(); 
       fprintf(stderr, "%s l.%d:\t%s\n", __FILE__, __LINE__, "Problème si l'on attends un thread qui n'existe pas");
       exit(-1);
     }
@@ -181,9 +173,8 @@ extern int thread_join(struct thread* thread, void **retval){
   return 0; 
 }
 
-//extern void thread_exit(void *retval){ 
+
 extern void thread_exit(void *retval) { 
-  //debug();
   // Si l'on a jamais appelé thread_create
   if (thread_set == NULL)
     exit(0);
@@ -207,7 +198,6 @@ extern void thread_exit(void *retval) {
 
 
 int thread_delete(struct thread* thread_to_del){
-  //debug();
   if (thread_to_del != NULL){
     thread_delete_context(thread_to_del);
     free(thread_to_del);
@@ -217,7 +207,6 @@ int thread_delete(struct thread* thread_to_del){
 }
 
 int thread_delete_context(struct thread* thread_to_del){
-  //debug();
   if (thread_to_del != NULL){
     if (thread_to_del->context != NULL){
       //#ifdef MODE_DEBUG
@@ -234,7 +223,6 @@ int thread_delete_context(struct thread* thread_to_del){
 
 
 int thread_isfinished(struct thread* thread){
-  //debug();
   if (thread_current == NULL)
     if (init())
       exit(-1);
@@ -242,7 +230,6 @@ int thread_isfinished(struct thread* thread){
 }
 
 int thread_getpriority(struct thread* thread){
-  //debug();
   if (thread_current == NULL)
     if (init())
       exit(-1);
