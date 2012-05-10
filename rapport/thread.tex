@@ -95,7 +95,7 @@ Si la valeur de retour de \textit{structure\_get()} est nulle, alors
 soit \textit{thread\_set} n'a jamais été initialisé ($i.e.$ c'est le
 premier appel à une fonction de la lib), soit il n'y a pas d'autre
 thread en attente d'exécution. Dans les deux cas aucun changement de
-context n'est fait.
+contexte n'est fait.
 
 \subsubsection{thread\_join()}
 Cette fonction met en pause le thread courant en attendant la
@@ -113,7 +113,7 @@ fonction interne \textit{thread\_delete()}, puisque celui ci est fini.
 
 
 \subsubsection{thread\_exit()}
-Cette fonction interrompt le thread courrant.
+Cette fonction interromp le thread courrant.
 
 On fixe la valeur de \textit{isfinished} à $1$, puis on change le
 contexte. Pour cela, on recherche un nouveau thread à exécuter avec la

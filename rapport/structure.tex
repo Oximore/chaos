@@ -1,15 +1,15 @@
 
-Grace à notre implémentation les threads de la runqueue peuvent être
+Grâce à notre implémentation les threads de la runqueue peuvent être
 stockés dans différentes structures. En effet, on peut facilement
 passer d'une structure à l'autre en changeant une option de
 compilation. Par défaut la structure d'arbre est choisie, pour
 sélectioner la structure liste il suffit de compiler avec l'option
-MODE\_LIST.Ceci nous a permis de tester facilement l'efficacité de ces
+MODE\_LIST. Ceci nous a permis de tester facilement l'efficacité de ces
 différentes structures.
 
 \subsection{Structure list}
 \subsubsection{Type de structure}
-Il s'agit d'une liste d'élément chaînés implémentée comme une
+Il s'agit d'une liste d'éléments chaînés implémentée comme une
 FIFO. Nous avons choisi de mettre un pointeur sur le dernier élément
 de la liste pour des raisons pratiques. Les threads sont encapsulés
 dans des structures element.
@@ -30,14 +30,14 @@ struct element {
 \subsubsection{Fonctions utilisées}
 Au lieu d'implémenter directement une gestion des priorités, les
 threads sont sélectionnés en tête (afin d'être exécutés), et ajoutés
-en queue. On utilise donc une structure de donnée très simple.  Les
+en queue. On utilise donc une structure de données très simple.  Les
 fonctions d'ajout et de selection de threads se font en temps
 constant.
 
 \subsection{Structure Arbre}
 \subsubsection{Type de structure}
 Nous avons décidé de créer une structure de type arbre binaire de
-recherche équilibré pour faciliter et optimisé l'implémentation
+recherche équilibré pour faciliter et optimiser l'implémentation
 éventuelle des priorités.
 
 En effet, l'arbre est trié selon les priorités, cela apporte une
@@ -59,7 +59,7 @@ struct node {
 \end{verbatim}
 
 Chaque structure node possède les champs left et right qui
-correspondent aux fils gauche et droit.  Le champ root correspond au
+correspondent aux fils gauche et droit. Le champ root correspond au
 père du noeud. Ce champ est nécessaire afin de pouvoir équilibrer
 l'arbre avec une faible complexité après chaque insertion et
 suppression de noeud.
@@ -74,5 +74,5 @@ sera placé à sa droite, et donc exécuté après) La fonction
 d'équilibrage se charge (grâce à des rotations droite et gauche)
 d'équilibrer tous les ancêtres du noeud ajouté ou supprimé.
 
-L'opération de selection est en $log(n)$ et celle de d'ajout est en
+L'opération de sélection est en $log(n)$ et celle de d'ajout est en
 $nlog(n)$.
